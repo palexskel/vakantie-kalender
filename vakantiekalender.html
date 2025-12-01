@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Verlofkalender Simulator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #f5f5f7;
+      --bg-alt: #ffffff;
+      --border: #d0d0d5;
+      --text: #222222;
+      --muted: #666666;
+      --accent: #ff9800;
+      --accent-soft: #ffe0b2;
+      --error: #d32f2f;
+      --weekend: #e3f2fd;
+      --holiday: #ffcdd2;
+      --regional: #ffe082;
+      --grid-border: #cccccc;
+      --cell-size: 2.3rem;
+      --radius: 0.4rem;
+      --shadow-soft: 0 2px 6px rgba(0,0,0,0.06);
+      --input-radius: 0.3rem;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .app {
+      max-width: 1200px;
+      margin: 1.5rem auto 2.5rem;
+      padding: 0 1rem;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      margin: 0 0 0.5rem;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+    }
+
+    .top-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .top-bar-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    label {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    select, input[type="number"] {
+      padding: 0.35rem 0.5rem;
+      border-radius: var(--input-radius);
+      border: 1px solid var(--border);
+      background: var(--bg-alt);
+      font-size: 0.9rem;
+      min-width: 120px;
+    }
+
+    select:disabled, input:disabled {
+      background: #eeeeee;
+      color: #888888;
+    }
+
+    .card {
+      background: var(--bg-alt);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-soft);
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .inputs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 0.75rem 1rem;
+      align-items: flex-end;
+    }
+
+    .input-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 0.35rem;
+      align-items: center;
+    }
+
+    .input-row input {
+      flex: 1;
+    }
+
+    .days-hint {
+      font-size: 0.8rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .totals-row {
+      margin-top: 0.5rem;
+      padding-top: 0.5rem;
+      border-top: 1px dashed var(--border);
+      font-size: 0.9rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .totals-row span {
+      white-space: nowrap;
+    }
+
+    .btn, button {
+      font-size: 0.85rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      padding: 0.35rem 0.9rem;
+      cursor: pointer;
+      background: var(--accent);
+      color: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border-color: var(--border);
+    }
+
+    .btn-danger {
+      background: var(--error);
+      color: #fff;
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .icon-pencil::before {
+      content: "✏️";
+    }
+
+    .icon-info::before {
+      content: "ℹ️";
+    }
+
+    .icon-download::before {
+      content: "⬇️";
+    }
+
+    .icon-reset::before {
+      content: "🗑️";
+    }
+
+    .calendar-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 900px) {
+      .calendar-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .calendar-wrapper {
+      overflow-x: auto;
+    }
+
+    .calendar-table {
+      border-collapse: collapse;
+      width: max-content;
+      min-width: 100%;
+      font-size: 0.76rem;
+    }
+
+    .calendar-table th,
+    .calendar-table td {
+      border: 1px solid var(--grid-border);
+      text-align: center;
+      padding: 0;
+      min-width: var(--cell-size);
+      height: var(--cell-size);
+    }
+
+    .calendar-table th {
+      background: #eeeeee;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    .month-cell {
+      background: #fafafa;
+      font-weight: 600;
+      position: sticky;
+      left: 0;
+      z-index: 1;
+      min-width: 70px;
+    }
+
+    .calendar-day {
+      cursor: pointer;
+      position: relative;
+      background: #ffffff;
+      transition: background 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    .calendar-day.weekend {
+      background: var(--weekend);
+      cursor: default;
+    }
+
+    .calendar-day.holiday-federal {
+      background: var(--holiday);
+      cursor: default;
+    }
+
+    .calendar-day.holiday-regional {
+      background: var(--regional);
+    }
+
+    .calendar-day.empty {
+      background: #f0f0f0;
+      cursor: default;
+    }
+
+    .calendar-day.selected-full {
+      background: var(--accent);
+      color: #ffffff;
+      box-shadow: inset 0 0 0 2px rgba(0,0,0,0.12);
+    }
+
+    .calendar-day.selected-half {
+      background: var(--accent-soft);
+      color: #000000;
+      box-shadow: inset 0 0 0 2px var(--accent);
+    }
+
+    .calendar-day.selected-half::after {
+      content: "½";
+      position: absolute;
+      bottom: 1px;
+      right: 3px;
+      font-size: 0.7em;
+      opacity: 0.9;
+    }
+
+    .calendar-day.click-disabled {
+      cursor: default;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1rem;
+      font-size: 0.8rem;
+      margin-top: 0.75rem;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .legend-color {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      border: 1px solid var(--grid-border);
+    }
+
+    .legend-workday {
+      background: #ffffff;
+    }
+
+    .legend-weekend {
+      background: var(--weekend);
+    }
+
+    .legend-holiday {
+      background: var(--holiday);
+    }
+
+    .legend-regional {
+      background: var(--regional);
+    }
+
+    .legend-selected-full {
+      background: var(--accent);
+    }
+
+    .legend-selected-half {
+      background: var(--accent-soft);
+    }
+
+    .side-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      font-size: 0.86rem;
+    }
+
+    .side-section-title {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .side-field {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+
+    .side-field span {
+      font-size: 0.85rem;
+    }
+
+    .side-label {
+      color: var(--muted);
+    }
+
+    .side-value {
+      font-weight: 500;
+    }
+
+    .side-day-box {
+      padding: 0.5rem 0.6rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: #fafafa;
+    }
+
+    .error-text {
+      color: var(--error);
+      font-size: 0.82rem;
+      margin-top: 0.25rem;
+    }
+
+    .footer-line {
+      margin-top: 0.75rem;
+      font-size: 0.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--muted);
+    }
+
+    .footer-right {
+      font-weight: 500;
+    }
+
+    .about-toggle {
+      margin-top: 0.75rem;
+    }
+
+    .about-content {
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.4;
+      border-radius: var(--radius);
+      border: 1px dashed var(--border);
+      padding: 0.75rem;
+      display: none;
+    }
+
+    .about-content.visible {
+      display: block;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: #fff;
+      padding: 0.6rem 1rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s ease;
+      z-index: 20;
+    }
+
+    .toast.visible {
+      opacity: 0.95;
+      pointer-events: auto;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <h1>Simulator betaalde verlofkalender</h1>
+  <div class="subtitle">
+    Kies je paritair comité en jaar, vul je tellers in en plan je verlofdagen in volgens de Belgische regels.
+  </div>
+
+  <div class="top-bar">
+    <div class="top-bar-group">
+      <label for="pc-select">Paritair comité</label>
+      <select id="pc-select">
+        <option value="PC200">PC 200 - Aanvullend Paritair Comité</option>
+        <option value="PC306">PC 306 - Verzekeringswezen</option>
+      </select>
+    </div>
+    <div class="top-bar-group">
+      <label for="year-select">Jaar</label>
+      <select id="year-select"></select>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="inputs-grid" id="inputs-grid">
+      <div class="input-item">
+        <label for="statutory-hours">Wettelijk verlof (uren)</label>
+        <div class="input-row">
+          <input type="number" id="statutory-hours" min="0" step="0.01" />
+          <span class="days-hint" id="statutory-days-label">0,0 dagen</span>
+        </div>
+      </div>
+      <div class="input-item">
+        <label for="replacement-hours">Vervangende feestdagen (uren)</label>
+        <div class="input-row">
+          <input type="number" id="replacement-hours" min="0" step="0.01" />
+          <span class="days-hint" id="replacement-days-label">0,0 dagen</span>
+        </div>
+      </div>
+      <div class="input-item">
+        <label for="regional-hours">Vlaamse Gemeenschap (uren)</label>
+        <div class="input-row">
+          <input type="number" id="regional-hours" min="0" step="0.01" />
+          <span class="days-hint" id="regional-days-label">0,0 dagen</span>
+        </div>
+      </div>
+
+      <div class="input-item">
+        <label for="adv1-hours">ADV1 (Q1) uren</label>
+        <div class="input-row">
+          <input type="number" id="adv1-hours" min="0" step="0.01" />
+          <span class="days-hint" id="adv1-days-label">0,0 dagen</span>
+        </div>
+      </div>
+      <div class="input-item">
+        <label for="adv2-hours">ADV2 (Q2) uren</label>
+        <div class="input-row">
+          <input type="number" id="adv2-hours" min="0" step="0.01" />
+          <span class="days-hint" id="adv2-days-label">0,0 dagen</span>
+        </div>
+      </div>
+      <div class="input-item">
+        <label for="adv3-hours">ADV3 (Q3) uren</label>
+        <div class="input-row">
+          <input type="number" id="adv3-hours" min="0" step="0.01" />
+          <span class="days-hint" id="adv3-days-label">0,0 dagen</span>
+        </div>
+      </div>
+      <div class="input-item">
+        <label for="adv4-hours">ADV4 (Q4) uren</label>
+        <div class="input-row">
+          <input type="number" id="adv4-hours" min="0" step="0.01" />
+          <span class="days-hint" id="adv4-days-label">0,0 dagen</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="totals-row">
+      <div>
+        <span id="total-hours-label">Totaal: 0,00 uur</span> ·
+        <span id="total-days-label">0,0 dagen</span>
+      </div>
+      <div style="display:flex; gap:0.5rem;">
+        <button id="confirm-inputs-btn" class="btn">
+          Input bevestigen
+        </button>
+        <button id="edit-inputs-btn" class="btn btn-secondary icon-pencil" style="display:none;">
+          Bewerk tellers
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card calendar-layout">
+    <div class="calendar-wrapper">
+      <table class="calendar-table" id="calendar-table" aria-label="Verlofkalender"></table>
+      <div class="legend">
+        <div class="legend-item">
+          <span class="legend-color legend-workday"></span>
+          <span>Werkdag (klikbaar)</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color legend-weekend"></span>
+          <span>Weekend / niet klikbaar</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color legend-holiday"></span>
+          <span>Wettelijke feestdag</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color legend-regional"></span>
+          <span>Regionale dag (11 juli)</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color legend-selected-full"></span>
+          <span>Verlofdag (volledig)</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color legend-selected-half"></span>
+          <span>Verlofdag (½ dag)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-panel">
+      <div>
+        <div class="side-section-title">Geselecteerde dag</div>
+        <div id="day-details" class="side-day-box">
+          <div class="side-field">
+            <span class="side-label">Datum</span>
+            <span class="side-value" id="detail-date">–</span>
+          </div>
+          <div class="side-field">
+            <span class="side-label">Weekdag</span>
+            <span class="side-value" id="detail-weekday">–</span>
+          </div>
+          <div class="side-field">
+            <span class="side-label">Feestdag</span>
+            <span class="side-value" id="detail-holiday">–</span>
+          </div>
+          <div class="side-field">
+            <span class="side-label">Type verlof</span>
+            <span class="side-value" id="detail-leave-type">–</span>
+          </div>
+          <div class="side-field">
+            <span class="side-label">Uren</span>
+            <span class="side-value" id="detail-leave-hours">–</span>
+          </div>
+          <div class="side-field">
+            <span class="side-label">½ dag?</span>
+            <span class="side-value" id="detail-half">–</span>
+          </div>
+          <div style="margin-top:0.4rem;">
+            <button id="remove-day-btn" class="btn btn-secondary" disabled>
+              Verwijder verlof van deze dag
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="side-section-title">Resterende saldo's</div>
+        <div class="side-day-box">
+          <div class="side-field">
+            <span class="side-label">Wettelijk verlof</span>
+            <span class="side-value" id="remaining-statutory">0,00 u (0,0 d)</span>
+          </div>
+          <div class="side-field">
+            <span class="side-label">Vervangende feestdagen</span>
+            <span class="side-value" id="remaining-replacement">0,00 u (0,0 d)</span>
+          </div>
+          <div class="side-field">
+            <span class="side-label">Vlaamse Gemeenschap</span>
+            <span class="side-value" id="remaining-regional">0,00 u (0,0 d)</span>
+          </div>
+          <div class="side-field">
+            <span class="side-label">ADV Q1</span>
+            <span class="side-value" id="remaining-adv1">0,00 u (0,0 d)</span>
+          </div>
+          <div class="side-field">
+            <span class="side-label">ADV Q2</span>
+            <span class="side-value" id="remaining-adv2">0,00 u (0,0 d)</span>
+          </div>
+          <div class="side-field">
+            <span class="side-label">ADV Q3</span>
+            <span class="side-value" id="remaining-adv3">0,00 u (0,0 d)</span>
+          </div>
+          <div class="side-field">
+            <span class="side-label">ADV Q4</span>
+            <span class="side-value" id="remaining-adv4">0,00 u (0,0 d)</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="side-section-title">Acties</div>
+        <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
+          <button id="export-csv-btn" class="btn btn-secondary icon-download">
+            Exporteer als CSV
+          </button>
+          <button id="reset-btn" class="btn btn-secondary icon-reset">
+            Reset planner
+          </button>
+        </div>
+        <div id="error-message" class="error-text"></div>
+      </div>
+
+      <div class="footer-line">
+        <div>
+          <button id="about-toggle-btn" class="btn btn-secondary icon-info about-toggle">
+            Over deze tool
+          </button>
+        </div>
+        <div class="footer-right">
+          Gemaakt door PAlex
+        </div>
+      </div>
+
+      <div id="about-content" class="about-content">
+        Deze tool is een simulator voor een persoonlijke verlofkalender. Je vult zelf je verschillende
+        vakantietellers in (wettelijk verlof, vervangende feestdagen, Vlaamse Gemeenschap en ADV per kwartaal)
+        en plaatst daarna verlofdagen in de kalender. De tool past automatisch de logica toe van PC 200 of
+        PC 306, inclusief het prioritaire gebruik van ADV-dagen en de beperking dat ADV pas kan worden
+        gebruikt vanaf het kwartaal waarin ze vrijkomen.<br><br>
+        <strong>Security & privacy:</strong> alle gegevens blijven volledig in je browser. Er wordt niets
+        doorgestuurd naar een server. De opgeslagen gegevens worden enkel in <code>localStorage</code> bewaard
+        zodat je planning beschikbaar blijft bij een volgende sessie. Via de reset-knop kun je alles in één klik
+        wissen.
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+  // --- Constants ---
+  const HOURS_FULL_DAY = 7.33;
+  const HOURS_HALF_DAY = 3.46;
+  const STORAGE_PREFIX = "verlofSimulator_";
+
+  const PC_CODES = {
+    PC200: "PC200",
+    PC306: "PC306",
+  };
+
+  const LEAVE_TYPES = {
+    ADV: "ADV",
+    REGIONAL: "REGIONAL",
+    REPLACEMENT: "REPLACEMENT",
+    STATUTORY: "STATUTORY",
+  };
+
+  // --- State ---
+  let state = {
+    year: new Date().getFullYear(),
+    pcCode: PC_CODES.PC200,
+    inputsLocked: false,
+    // Hours the user entered (initial capacity)
+    countersInitial: {
+      statutory: 0,
+      replacement: 0,
+      regional: 0,
+      adv: [0, 0, 0, 0], // Q1..Q4
+    },
+    // Per-day usage
+    daySelections: {
+      // "YYYY-MM-DD": { type, hours, half, advBucket? }
+    },
+    holidays: [], // computed list of holiday objects for current year+pc
+  };
+
+  // --- Utility helpers ---
+  function formatHours(h) {
+    return (Math.round(h * 100) / 100).toFixed(2).replace(".", ",");
+  }
+
+  function floorDays(hours) {
+    const days = hours / HOURS_FULL_DAY;
+    const floored = Math.floor(days * 10) / 10;
+    return floored.toFixed(1).replace(".", ",");
+  }
+
+  function isoDate(date) {
+    return date.toISOString().split("T")[0];
+  }
+
+  function isWeekend(date) {
+    const d = date.getDay(); // 0=zo,6=za
+    return d === 0 || d === 6;
+  }
+
+  function getAdvBucketForDate(date) {
+    const m = date.getMonth(); // 0-11
+    if (m <= 2) return 0; // jan-mrt
+    if (m <= 5) return 1; // apr-jun
+    if (m <= 8) return 2; // jul-sep
+    return 3; // okt-dec
+  }
+
+  function getAdvBucketAvailableFrom(bucketIndex, year) {
+    if (bucketIndex === 0) return new Date(year, 0, 1); // 1 jan
+    if (bucketIndex === 1) return new Date(year, 3, 1); // 1 apr
+    if (bucketIndex === 2) return new Date(year, 6, 1); // 1 jul
+    return new Date(year, 9, 1); // 1 okt
+  }
+
+  function weekdayName(date) {
+    const days = ["Zondag", "Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag"];
+    return days[date.getDay()];
+  }
+
+  function monthNames() {
+    return [
+      "januari","februari","maart","april","mei","juni",
+      "juli","augustus","september","oktober","november","december"
+    ];
+  }
+
+  function showToast(message) {
+    const toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.classList.add("visible");
+    setTimeout(() => toast.classList.remove("visible"), 2200);
+  }
+
+  // --- Easter calculation and Belgian holidays ---
+  function getEasterDate(year) {
+    // Meeus/Jones/Butcher algorithm
+    const a = year % 19;
+    const b = Math.floor(year / 100);
+    const c = year % 100;
+    const d = Math.floor(b / 4);
+    const e = b % 4;
+    const f = Math.floor((b + 8) / 25);
+    const g = Math.floor((b - f + 1) / 3);
+    const h = (19 * a + b - d - g + 15) % 30;
+    const i = Math.floor(c / 4);
+    const k = c % 4;
+    const l = (32 + 2 * e + 2 * i - h - k) % 7;
+    const m = Math.floor((a + 11 * h + 22 * l) / 451);
+    const month = Math.floor((h + l - 7 * m + 114) / 31); // 3=March,4=April
+    const day = ((h + l - 7 * m + 114) % 31) + 1;
+    return new Date(year, month - 1, day);
+  }
+
+  function addDays(date, days) {
+    const d = new Date(date.getTime());
+    d.setDate(d.getDate() + days);
+    return d;
+  }
+
+  function buildHolidays(year, pcCode) {
+    const holidays = [];
+
+    function addHoliday(date, name, type) {
+      holidays.push({
+        date: isoDate(date),
+        name,
+        type, // "FEDERAL" | "REGIONAL"
+      });
+    }
+
+    // Fixed federal holidays
+    addHoliday(new Date(year, 0, 1), "Nieuwjaar", "FEDERAL");
+    addHoliday(new Date(year, 4, 1), "Dag van de Arbeid", "FEDERAL");
+    addHoliday(new Date(year, 6, 21), "Nationale feestdag", "FEDERAL");
+    addHoliday(new Date(year, 7, 15), "Onze-Lieve-Vrouw Hemelvaart", "FEDERAL");
+    addHoliday(new Date(year, 10, 1), "Allerheiligen", "FEDERAL");
+    addHoliday(new Date(year, 10, 11), "Wapenstilstand", "FEDERAL");
+    addHoliday(new Date(year, 11, 25), "Kerstmis", "FEDERAL");
+
+    // Movable federal holidays based on Easter
+    const easter = getEasterDate(year);
+    addHoliday(addDays(easter, 1), "Paasmaandag", "FEDERAL");
+    addHoliday(addDays(easter, 39), "Onze-Lieve-Heer Hemelvaart", "FEDERAL");
+    addHoliday(addDays(easter, 50), "Pinkstermaandag", "FEDERAL");
+
+    // Regional day: Vlaamse Gemeenschap (11 juli) – relevant voor PC306
+    if (pcCode === PC_CODES.PC306) {
+      addHoliday(new Date(year, 6, 11), "Feestdag Vlaamse Gemeenschap", "REGIONAL");
+    }
+
+    return holidays;
+  }
+
+  function getHolidayMap() {
+    const map = {};
+    state.holidays.forEach(h => {
+      map[h.date] = h;
+    });
+    return map;
+  }
+
+  // --- PC Rules (config) ---
+  function getPcRules(pcCode) {
+    if (pcCode === PC_CODES.PC306) {
+      return {
+        code: PC_CODES.PC306,
+        getDefaultCounters(year) {
+          return {
+            statutory: 0,
+            replacement: 0,
+            regional: HOURS_FULL_DAY, // 1 dag Vlaamse Gemeenschap
+            adv: [0, 0, 0, 0],
+          };
+        },
+        getLeavePriority() {
+          return [LEAVE_TYPES.ADV, LEAVE_TYPES.REGIONAL, LEAVE_TYPES.REPLACEMENT, LEAVE_TYPES.STATUTORY];
+        },
+      };
+    }
+    // Default PC200
+    return {
+      code: PC_CODES.PC200,
+      getDefaultCounters(year) {
+        return {
+          statutory: 0,
+          replacement: 0,
+          regional: 0,
+          adv: [0, 0, 0, 0],
+        };
+      },
+      getLeavePriority() {
+        return [LEAVE_TYPES.ADV, LEAVE_TYPES.REGIONAL, LEAVE_TYPES.REPLACEMENT, LEAVE_TYPES.STATUTORY];
+      },
+    };
+  }
+
+  // --- Local storage ---
+  function storageKey(year, pcCode) {
+    return `${STORAGE_PREFIX}${year}_${pcCode}`;
+  }
+
+  function saveState() {
+    try {
+      const key = storageKey(state.year, state.pcCode);
+      const minimal = {
+        year: state.year,
+        pcCode: state.pcCode,
+        inputsLocked: state.inputsLocked,
+        countersInitial: state.countersInitial,
+        daySelections: state.daySelections,
+      };
+      localStorage.setItem(key, JSON.stringify(minimal));
+    } catch (e) {
+      console.warn("Kon state niet opslaan:", e);
+    }
+  }
+
+  function loadStateFor(year, pcCode) {
+    const key = storageKey(year, pcCode);
+    const raw = localStorage.getItem(key);
+    const pcRules = getPcRules(pcCode);
+    const defaults = pcRules.getDefaultCounters(year);
+
+    state.year = year;
+    state.pcCode = pcCode;
+    state.holidays = buildHolidays(year, pcCode);
+
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw);
+        state.inputsLocked = !!parsed.inputsLocked;
+        state.countersInitial = parsed.countersInitial || { statutory: 0, replacement: 0, regional: 0, adv: [0, 0, 0, 0] };
+        state.daySelections = parsed.daySelections || {};
+      } catch (e) {
+        console.warn("Kon state niet parsen, gebruik defaults:", e);
+        state.inputsLocked = false;
+        state.countersInitial = defaults;
+        state.daySelections = {};
+      }
+    } else {
+      state.inputsLocked = false;
+      state.countersInitial = defaults;
+      state.daySelections = {};
+    }
+  }
+
+  function resetStateConfirmation() {
+    const yes = window.confirm("Weet je zeker dat je alle ingevoerde gegevens en geplande verlofdagen wilt wissen?");
+    if (!yes) return;
+    const pcRules = getPcRules(state.pcCode);
+    const defaults = pcRules.getDefaultCounters(state.year);
+    state.inputsLocked = false;
+    state.countersInitial = defaults;
+    state.daySelections = {};
+    const key = storageKey(state.year, state.pcCode);
+    localStorage.removeItem(key);
+    showToast("Planner gereset");
+    updateUIFromState();
+  }
+
+  // --- Remaining counters ---
+  function computeUsedHours() {
+    const used = {
+      statutory: 0,
+      replacement: 0,
+      regional: 0,
+      adv: [0, 0, 0, 0],
+    };
+
+    Object.values(state.daySelections).forEach(sel => {
+      switch (sel.type) {
+        case LEAVE_TYPES.STATUTORY:
+          used.statutory += sel.hours;
+          break;
+        case LEAVE_TYPES.REPLACEMENT:
+          used.replacement += sel.hours;
+          break;
+        case LEAVE_TYPES.REGIONAL:
+          used.regional += sel.hours;
+          break;
+        case LEAVE_TYPES.ADV:
+          if (typeof sel.advBucket === "number") {
+            used.adv[sel.advBucket] += sel.hours;
+          }
+          break;
+      }
+    });
+
+    return used;
+  }
+
+  function computeRemaining() {
+    const used = computeUsedHours();
+    return {
+      statutory: state.countersInitial.statutory - used.statutory,
+      replacement: state.countersInitial.replacement - used.replacement,
+      regional: state.countersInitial.regional - used.regional,
+      adv: [
+        state.countersInitial.adv[0] - used.adv[0],
+        state.countersInitial.adv[1] - used.adv[1],
+        state.countersInitial.adv[2] - used.adv[2],
+        state.countersInitial.adv[3] - used.adv[3],
+      ],
+    };
+  }
+
+  // --- Calendar rendering ---
+  function buildCalendarTable() {
+    const table = document.getElementById("calendar-table");
+    table.innerHTML = "";
+
+    const months = monthNames();
+    const daysHeader = document.createElement("tr");
+
+    // Empty corner cell
+    const corner = document.createElement("th");
+    corner.textContent = "";
+    corner.className = "month-cell";
+    daysHeader.appendChild(corner);
+
+    for (let d = 1; d <= 31; d++) {
+      const th = document.createElement("th");
+      th.textContent = d.toString();
+      daysHeader.appendChild(th);
+    }
+
+    table.appendChild(daysHeader);
+
+    const holidayMap = getHolidayMap();
+
+    for (let m = 0; m < 12; m++) {
+      const row = document.createElement("tr");
+      const monthCell = document.createElement("td");
+      monthCell.textContent = months[m];
+      monthCell.className = "month-cell";
+      row.appendChild(monthCell);
+
+      for (let d = 1; d <= 31; d++) {
+        const cell = document.createElement("td");
+
+        const dateObj = new Date(state.year, m, d);
+        if (dateObj.getMonth() !== m) {
+          cell.className = "calendar-day empty";
+          cell.textContent = "";
+          row.appendChild(cell);
+          continue;
+        }
+
+        const dateIso = isoDate(dateObj);
+        cell.className = "calendar-day";
+        cell.textContent = d.toString();
+        cell.dataset.date = dateIso;
+
+        const isWE = isWeekend(dateObj);
+        const holiday = holidayMap[dateIso] || null;
+        if (isWE) {
+          cell.classList.add("weekend", "click-disabled");
+        }
+        if (holiday) {
+          if (holiday.type === "FEDERAL") {
+            cell.classList.add("holiday-federal", "click-disabled");
+          } else if (holiday.type === "REGIONAL") {
+            cell.classList.add("holiday-regional");
+          }
+          cell.title = holiday.name;
+        }
+
+        const clickable = !cell.classList.contains("click-disabled");
+        if (clickable) {
+          cell.addEventListener("click", (ev) => onDayClick(ev, dateObj, false));
+          cell.addEventListener("contextmenu", (ev) => onDayClick(ev, dateObj, true));
+          cell.addEventListener("mouseenter", () => showDayDetails(dateObj));
+        } else {
+          cell.addEventListener("mouseenter", () => showDayDetails(dateObj));
+        }
+
+        row.appendChild(cell);
+      }
+
+      table.appendChild(row);
+    }
+
+    // Apply existing selections
+    applySelectionStyles();
+  }
+
+  function applySelectionStyles() {
+    const table = document.getElementById("calendar-table");
+    const cells = table.querySelectorAll(".calendar-day");
+    cells.forEach(cell => {
+      cell.classList.remove("selected-full", "selected-half");
+    });
+
+    Object.entries(state.daySelections).forEach(([dateIso, sel]) => {
+      const cell = table.querySelector(`.calendar-day[data-date="${dateIso}"]`);
+      if (!cell) return;
+      if (sel.half) {
+        cell.classList.add("selected-half");
+      } else {
+        cell.classList.add("selected-full");
+      }
+    });
+  }
+
+  // --- Click logic ---
+  function onDayClick(event, dateObj, isRightClick) {
+    event.preventDefault();
+    const errorElement = document.getElementById("error-message");
+    errorElement.textContent = "";
+
+    const dateIsoStr = isoDate(dateObj);
+    const table = document.getElementById("calendar-table");
+    const cell = table.querySelector(`.calendar-day[data-date="${dateIsoStr}"]`);
+    if (!cell || cell.classList.contains("click-disabled")) {
+      return;
+    }
+
+    if (!state.inputsLocked) {
+      showToast("Bevestig eerst de tellers voordat je verlof inplant.");
+      return;
+    }
+
+    const half = isRightClick;
+    const neededHours = half ? HOURS_HALF_DAY : HOURS_FULL_DAY;
+    const remaining = computeRemaining();
+
+    // If day already selected: just show details (no toggle) – user must use 'Verwijder' knop
+    if (state.daySelections[dateIsoStr]) {
+      showDayDetails(dateObj);
+      return;
+    }
+
+    // Determine leave source based on priority
+    const pcRules = getPcRules(state.pcCode);
+    const priority = pcRules.getLeavePriority();
+
+    let chosenType = null;
+    let chosenBucket = null;
+
+    // Build accessible ADV buckets (availableFrom <= date)
+    const accessibleAdvBuckets = [];
+    for (let i = 0; i < 4; i++) {
+      const from = getAdvBucketAvailableFrom(i, state.year);
+      if (from.getTime() <= dateObj.getTime()) {
+        accessibleAdvBuckets.push(i);
+      }
+    }
+
+    for (const type of priority) {
+      if (type === LEAVE_TYPES.ADV) {
+        let bestBucket = null;
+        for (const b of accessibleAdvBuckets) {
+          if (remaining.adv[b] >= neededHours) {
+            bestBucket = b;
+            break;
+          }
+        }
+        if (bestBucket !== null) {
+          chosenType = LEAVE_TYPES.ADV;
+          chosenBucket = bestBucket;
+          break;
+        }
+      } else if (type === LEAVE_TYPES.REGIONAL) {
+        if (remaining.regional >= neededHours) {
+          chosenType = LEAVE_TYPES.REGIONAL;
+          break;
+        }
+      } else if (type === LEAVE_TYPES.REPLACEMENT) {
+        if (remaining.replacement >= neededHours) {
+          chosenType = LEAVE_TYPES.REPLACEMENT;
+          break;
+        }
+      } else if (type === LEAVE_TYPES.STATUTORY) {
+        if (remaining.statutory >= neededHours) {
+          chosenType = LEAVE_TYPES.STATUTORY;
+          break;
+        }
+      }
+    }
+
+    if (!chosenType) {
+      // Check if future ADV exists
+      let earliestFuture = null;
+      for (let i = 0; i < 4; i++) {
+        const futureHours = remaining.adv[i];
+        if (futureHours > 0) {
+          const from = getAdvBucketAvailableFrom(i, state.year);
+          if (from.getTime() > dateObj.getTime()) {
+            if (!earliestFuture || from.getTime() < earliestFuture.getTime()) {
+              earliestFuture = from;
+            }
+          }
+        }
+      }
+
+      if (earliestFuture) {
+        const dd = String(earliestFuture.getDate()).padStart(2, "0");
+        const mm = String(earliestFuture.getMonth() + 1).padStart(2, "0");
+        const yyyy = earliestFuture.getFullYear();
+        errorElement.textContent =
+          "Je kan op deze datum geen ADV meer gebruiken. Eerstvolgende datum waarop ADV beschikbaar komt: " +
+          `${dd}/${mm}/${yyyy}.`;
+      } else {
+        errorElement.textContent =
+          "Je hebt niet genoeg resterende verlofuren om deze dag in te plannen.";
+      }
+      showToast("Verlof kan niet ingepland worden op deze datum.");
+      return;
+    }
+
+    // All good: store selection
+    state.daySelections[dateIsoStr] = {
+      type: chosenType,
+      hours: neededHours,
+      half: half,
+      advBucket: chosenType === LEAVE_TYPES.ADV ? chosenBucket : undefined,
+    };
+
+    saveState();
+    applySelectionStyles();
+    updateRemainingUI();
+    showDayDetails(dateObj);
+  }
+
+  function removeLeaveFromSelectedDay() {
+    const detailDateEl = document.getElementById("detail-date");
+    const text = detailDateEl.dataset.iso;
+    if (!text) return;
+
+    if (!state.daySelections[text]) return;
+
+    const yes = window.confirm("Verlof op deze dag verwijderen?");
+    if (!yes) return;
+
+    delete state.daySelections[text];
+    saveState();
+    applySelectionStyles();
+    updateRemainingUI();
+    showDayDetails(new Date(text));
+  }
+
+  // --- Day details UI ---
+  function showDayDetails(dateObj) {
+    const dateIsoStr = isoDate(dateObj);
+    const holidayMap = getHolidayMap();
+    const sel = state.daySelections[dateIsoStr] || null;
+
+    const dEl = document.getElementById("detail-date");
+    const wEl = document.getElementById("detail-weekday");
+    const hEl = document.getElementById("detail-holiday");
+    const tEl = document.getElementById("detail-leave-type");
+    const hrsEl = document.getElementById("detail-leave-hours");
+    const halfEl = document.getElementById("detail-half");
+    const removeBtn = document.getElementById("remove-day-btn");
+
+    const dd = String(dateObj.getDate()).padStart(2, "0");
+    const mm = String(dateObj.getMonth() + 1).padStart(2, "0");
+    const yyyy = dateObj.getFullYear();
+
+    dEl.textContent = `${dd}/${mm}/${yyyy}`;
+    dEl.dataset.iso = dateIsoStr;
+    wEl.textContent = weekdayName(dateObj);
+
+    const holiday = holidayMap[dateIsoStr];
+    if (holiday) {
+      hEl.textContent = holiday.name;
+    } else if (isWeekend(dateObj)) {
+      hEl.textContent = "Weekend";
+    } else {
+      hEl.textContent = "–";
+    }
+
+    if (!sel) {
+      tEl.textContent = "Geen";
+      hrsEl.textContent = "–";
+      halfEl.textContent = "–";
+      removeBtn.disabled = true;
+    } else {
+      let typeLabel = "";
+      switch (sel.type) {
+        case LEAVE_TYPES.ADV:
+          typeLabel = "ADV";
+          if (typeof sel.advBucket === "number") {
+            typeLabel += ` (Q${sel.advBucket + 1})`;
+          }
+          break;
+        case LEAVE_TYPES.REGIONAL:
+          typeLabel = "Vlaamse Gemeenschap";
+          break;
+        case LEAVE_TYPES.REPLACEMENT:
+          typeLabel = "Vervangende feestdag";
+          break;
+        case LEAVE_TYPES.STATUTORY:
+          typeLabel = "Wettelijk verlof";
+          break;
+      }
+      tEl.textContent = typeLabel;
+      hrsEl.textContent = formatHours(sel.hours) + " u";
+      halfEl.textContent = sel.half ? "Ja" : "Nee";
+      removeBtn.disabled = false;
+    }
+  }
+
+  // --- Inputs & totals ---
+  function updateInputDaysLabels() {
+    const statutory = parseFloat(document.getElementById("statutory-hours").value) || 0;
+    const replacement = parseFloat(document.getElementById("replacement-hours").value) || 0;
+    const regional = parseFloat(document.getElementById("regional-hours").value) || 0;
+    const adv1 = parseFloat(document.getElementById("adv1-hours").value) || 0;
+    const adv2 = parseFloat(document.getElementById("adv2-hours").value) || 0;
+    const adv3 = parseFloat(document.getElementById("adv3-hours").value) || 0;
+    const adv4 = parseFloat(document.getElementById("adv4-hours").value) || 0;
+
+    document.getElementById("statutory-days-label").textContent = `${floorDays(statutory)} dagen`;
+    document.getElementById("replacement-days-label").textContent = `${floorDays(replacement)} dagen`;
+    document.getElementById("regional-days-label").textContent = `${floorDays(regional)} dagen`;
+    document.getElementById("adv1-days-label").textContent = `${floorDays(adv1)} dagen`;
+    document.getElementById("adv2-days-label").textContent = `${floorDays(adv2)} dagen`;
+    document.getElementById("adv3-days-label").textContent = `${floorDays(adv3)} dagen`;
+    document.getElementById("adv4-days-label").textContent = `${floorDays(adv4)} dagen`;
+
+    const totalHours = statutory + replacement + regional + adv1 + adv2 + adv3 + adv4;
+    document.getElementById("total-hours-label").textContent = `Totaal: ${formatHours(totalHours)} uur`;
+    document.getElementById("total-days-label").textContent = `${floorDays(totalHours)} dagen`;
+  }
+
+  function confirmInputs() {
+    const statutory = parseFloat(document.getElementById("statutory-hours").value) || 0;
+    const replacement = parseFloat(document.getElementById("replacement-hours").value) || 0;
+    const regional = parseFloat(document.getElementById("regional-hours").value) || 0;
+    const adv1 = parseFloat(document.getElementById("adv1-hours").value) || 0;
+    const adv2 = parseFloat(document.getElementById("adv2-hours").value) || 0;
+    const adv3 = parseFloat(document.getElementById("adv3-hours").value) || 0;
+    const adv4 = parseFloat(document.getElementById("adv4-hours").value) || 0;
+
+    state.countersInitial = {
+      statutory,
+      replacement,
+      regional,
+      adv: [adv1, adv2, adv3, adv4],
+    };
+    state.inputsLocked = true;
+    saveState();
+    showToast("Tellers bevestigd. Je kan nu verlof inplannen.");
+    updateInputsLockedUI();
+    updateRemainingUI();
+  }
+
+  function updateInputsLockedUI() {
+    const locked = state.inputsLocked;
+    const ids = [
+      "statutory-hours","replacement-hours","regional-hours",
+      "adv1-hours","adv2-hours","adv3-hours","adv4-hours",
+    ];
+    ids.forEach(id => {
+      document.getElementById(id).disabled = locked;
+    });
+
+    document.getElementById("confirm-inputs-btn").style.display = locked ? "none" : "inline-flex";
+    document.getElementById("edit-inputs-btn").style.display = locked ? "inline-flex" : "none";
+  }
+
+  function editInputs() {
+    state.inputsLocked = false;
+    saveState();
+    showToast("Tellers weer bewerkbaar.");
+    updateInputsLockedUI();
+  }
+
+  function updateRemainingUI() {
+    const rem = computeRemaining();
+    const fields = [
+      ["remaining-statutory", rem.statutory],
+      ["remaining-replacement", rem.replacement],
+      ["remaining-regional", rem.regional],
+      ["remaining-adv1", rem.adv[0]],
+      ["remaining-adv2", rem.adv[1]],
+      ["remaining-adv3", rem.adv[2]],
+      ["remaining-adv4", rem.adv[3]],
+    ];
+    fields.forEach(([id, hours]) => {
+      document.getElementById(id).textContent =
+        `${formatHours(hours)} u (${floorDays(hours)} d)`;
+    });
+  }
+
+  // --- Year & PC dropdowns ---
+  function initYearSelect() {
+    const select = document.getElementById("year-select");
+    select.innerHTML = "";
+    const currentYear = new Date().getFullYear();
+    for (let y = currentYear - 2; y <= currentYear + 3; y++) {
+      const opt = document.createElement("option");
+      opt.value = y.toString();
+      opt.textContent = y.toString();
+      if (y === state.year) opt.selected = true;
+      select.appendChild(opt);
+    }
+  }
+
+  function onYearChange() {
+    const year = parseInt(document.getElementById("year-select").value, 10);
+    const pcCode = document.getElementById("pc-select").value;
+    loadStateFor(year, pcCode);
+    updateUIFromState();
+    showToast("Jaar gewijzigd.");
+  }
+
+  function onPcChange() {
+    const pcCode = document.getElementById("pc-select").value;
+    const year = parseInt(document.getElementById("year-select").value, 10);
+    loadStateFor(year, pcCode);
+    updateUIFromState();
+    showToast("Paritair comité gewijzigd.");
+  }
+
+  // --- CSV Export ---
+  function exportCsv() {
+    const entries = Object.entries(state.daySelections);
+    if (entries.length === 0) {
+      showToast("Geen ingeplande verlofdagen om te exporteren.");
+      return;
+    }
+
+    const holidayMap = getHolidayMap();
+    const rows = [];
+    rows.push(["date","weekday","type","hours","is_half_day","holiday_label"].join(";"));
+
+    // Sort by date
+    entries.sort(([d1], [d2]) => d1.localeCompare(d2));
+
+    entries.forEach(([dateIso, sel]) => {
+      const dateObj = new Date(dateIso);
+      const holiday = holidayMap[dateIso];
+      let typeLabel = "";
+      switch (sel.type) {
+        case LEAVE_TYPES.ADV:
+          typeLabel = "ADV";
+          if (typeof sel.advBucket === "number") {
+            typeLabel += ` (Q${sel.advBucket + 1})`;
+          }
+          break;
+        case LEAVE_TYPES.REGIONAL:
+          typeLabel = "Vlaamse Gemeenschap";
+          break;
+        case LEAVE_TYPES.REPLACEMENT:
+          typeLabel = "Vervangende feestdag";
+          break;
+        case LEAVE_TYPES.STATUTORY:
+          typeLabel = "Wettelijk verlof";
+          break;
+      }
+      const row = [
+        dateIso,
+        weekdayName(dateObj),
+        typeLabel,
+        sel.hours.toFixed(2).replace(".", ","),
+        sel.half ? "1" : "0",
+        holiday ? holiday.name : "",
+      ];
+      rows.push(row.join(";"));
+    });
+
+    const csvContent = rows.join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `verlofplanning_${state.year}_${state.pcCode}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  // --- About toggle ---
+  function toggleAbout() {
+    const box = document.getElementById("about-content");
+    box.classList.toggle("visible");
+  }
+
+  // --- Global UI update ---
+  function updateUIFromState() {
+    // PC & year dropdown
+    initYearSelect();
+    document.getElementById("year-select").value = String(state.year);
+    document.getElementById("pc-select").value = state.pcCode;
+
+    // Inputs
+    document.getElementById("statutory-hours").value = state.countersInitial.statutory || 0;
+    document.getElementById("replacement-hours").value = state.countersInitial.replacement || 0;
+    document.getElementById("regional-hours").value = state.countersInitial.regional || 0;
+    document.getElementById("adv1-hours").value = state.countersInitial.adv[0] || 0;
+    document.getElementById("adv2-hours").value = state.countersInitial.adv[1] || 0;
+    document.getElementById("adv3-hours").value = state.countersInitial.adv[2] || 0;
+    document.getElementById("adv4-hours").value = state.countersInitial.adv[3] || 0;
+
+    updateInputDaysLabels();
+    updateInputsLockedUI();
+
+    // Calendar
+    buildCalendarTable();
+
+    // Remaining
+    updateRemainingUI();
+
+    // Clear errors & details
+    document.getElementById("error-message").textContent = "";
+    const now = new Date(state.year, 0, 1);
+    showDayDetails(now);
+  }
+
+  // --- Init ---
+  document.addEventListener("DOMContentLoaded", () => {
+    const currentYear = new Date().getFullYear();
+    const initialPc = document.getElementById("pc-select").value || PC_CODES.PC200;
+    loadStateFor(currentYear, initialPc);
+    initYearSelect();
+    updateUIFromState();
+
+    // Inputs change
+    [
+      "statutory-hours","replacement-hours","regional-hours",
+      "adv1-hours","adv2-hours","adv3-hours","adv4-hours",
+    ].forEach(id => {
+      document.getElementById(id).addEventListener("input", updateInputDaysLabels);
+    });
+
+    document.getElementById("confirm-inputs-btn").addEventListener("click", confirmInputs);
+    document.getElementById("edit-inputs-btn").addEventListener("click", editInputs);
+
+    document.getElementById("year-select").addEventListener("change", onYearChange);
+    document.getElementById("pc-select").addEventListener("change", onPcChange);
+
+    document.getElementById("remove-day-btn").addEventListener("click", removeLeaveFromSelectedDay);
+    document.getElementById("export-csv-btn").addEventListener("click", exportCsv);
+    document.getElementById("reset-btn").addEventListener("click", resetStateConfirmation);
+
+    document.getElementById("about-toggle-btn").addEventListener("click", toggleAbout);
+  });
+</script>
+</body>
+</html>
