@@ -256,6 +256,12 @@
       overflow-x: visible;
     }
 
+    .calendar-help {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+
     .calendar-table {
       border-collapse: collapse;
       width: 100%;
@@ -304,7 +310,7 @@
       cursor: pointer;
       position: relative;
       background: var(--bg-alt);
-      transition: background 0.12s ease, box-shadow 0.12s ease;
+      transition: background 0.12s ease, box-shadow 0.12s ease, transform 0.12s ease;
       color: var(--text);
     }
 
@@ -359,6 +365,19 @@
 
     .calendar-day.click-disabled {
       cursor: default;
+    }
+
+    /* Shake effect bij mislukte klik */
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-2px); }
+      50% { transform: translateX(2px); }
+      75% { transform: translateX(-2px); }
+      100% { transform: translateX(0); }
+    }
+
+    .calendar-day.shake {
+      animation: shake 0.2s linear;
     }
 
     /* =====================
@@ -490,6 +509,12 @@
       display: block;
     }
 
+    /* Negatieve saldi visueel aanduiden */
+    .negative {
+      color: var(--error);
+      font-weight: 600;
+    }
+
     /* =====================
        TOAST
        ===================== */
@@ -524,7 +549,7 @@
 </head>
 <body>
 <div class="app">
-  <h1>Simulator verlofkalender</h1>
+  <h1>Simulator betaalde verlofkalender</h1>
   <div class="subtitle">
     Kies je paritair comité en jaar, vul je tellers in en plan je verlofdagen in volgens de Belgische regels.
   </div>
@@ -543,7 +568,7 @@
     </div>
     <div class="top-bar-spacer"></div>
     <button id="theme-toggle" class="theme-toggle-btn" aria-label="Schakel naar lichte modus">
-      ☀️<span>Dark mode</span>
+      ☀️<span>Lichte modus</span>
     </button>
   </div>
 
@@ -619,6 +644,9 @@
 
   <div class="card">
     <div class="calendar-wrapper">
+      <p class="calendar-help">
+        Linkermuisklik = volledige dag (7,33 u) · Rechtermuisklik = halve dag (3,46 u) · Op een geselecteerde dag opnieuw klikken verwijdert het verlof.
+      </p>
       <table class="calendar-table" id="calendar-table" aria-label="Verlofkalender"></table>
       <div class="legend">
         <div class="legend-item">
@@ -661,7 +689,7 @@
             <span class="side-value" id="detail-weekday">–</span>
           </div>
           <div class="side-field">
-            <span classside-label">Feestdag</span>
+            <span class="side-label">Feestdag</span>
             <span class="side-value" id="detail-holiday">–</span>
           </div>
           <div class="side-field">
@@ -675,11 +703,6 @@
           <div class="side-field">
             <span class="side-label">½ dag?</span>
             <span class="side-value" id="detail-half">–</span>
-          </div>
-          <div style="margin-top:0.4rem;">
-            <button id="remove-day-btn" class="btn btn-secondary" disabled>
-              Verwijder verlof van deze dag
-            </button>
           </div>
         </div>
       </div>
@@ -759,9 +782,9 @@
         wettelijke Belgische feestdagen zijn niet klikbaar. De regionale feestdag van de Vlaamse Gemeenschap
         (11 juli) wordt apart aangeduid voor PC 306.<br><br>
         Je ziet steeds een overzicht van de resterende uren en dagen per type verlof, samen met een totaalsaldo.
-        Je kunt ingeplande verlof op een dag verwijderen door de dag opnieuw aan te klikken of via de knop
-        “Verwijder verlof van deze dag”. Met de exportfunctie kun je je planning downloaden als CSV-bestand
-        (handig om verder te verwerken of door te geven aan HR).<br><br>
+        Je kunt ingeplande verlof op een dag verwijderen door de dag opnieuw aan te klikken (linker- of
+        rechtermuisklik). Met de exportfunctie kun je je planning downloaden als CSV-bestand (handig om verder
+        te verwerken of door te geven aan HR).<br><br>
         <strong>Security & privacy:</strong> alle gegevens blijven volledig in je browser. Er wordt niets doorgestuurd
         naar een server of externe dienst. De gegevens (tellers, gekozen comité, jaar en geplande dagen) worden enkel
         opgeslagen in <code>localStorage</code> op jouw toestel, zodat je planning bewaard blijft bij een volgende
@@ -826,14 +849,6 @@
   function isWeekend(date) {
     const d = date.getDay();
     return d === 0 || d === 6;
-  }
-
-  function getAdvBucketForDate(date) {
-    const m = date.getMonth();
-    if (m <= 2) return 0;
-    if (m <= 5) return 1;
-    if (m <= 8) return 2;
-    return 3;
   }
 
   function getAdvBucketAvailableFrom(bucketIndex, year) {
@@ -1184,7 +1199,7 @@
       return;
     }
 
-    // Als er al verlof staat: toggle = verwijderen
+    // Toggle: als er al verlof is, verwijderen bij tweede klik
     if (state.daySelections[dateIsoStr]) {
       delete state.daySelections[dateIsoStr];
       saveState();
@@ -1270,6 +1285,9 @@
         errorElement.textContent =
           "Je hebt niet genoeg resterende verlofuren om deze dag in te plannen.";
       }
+      // Visuele feedback
+      cell.classList.add("shake");
+      setTimeout(() => cell.classList.remove("shake"), 200);
       showToast("Verlof kan niet ingepland worden op deze datum.");
       return;
     }
@@ -1287,22 +1305,6 @@
     showDayDetails(dateObj);
   }
 
-  function removeLeaveFromSelectedDay() {
-    const detailDateEl = document.getElementById("detail-date");
-    const iso = detailDateEl.dataset.iso;
-    if (!iso || !state.daySelections[iso]) return;
-
-    const yes = window.confirm("Verlof op deze dag verwijderen?");
-    if (!yes) return;
-
-    delete state.daySelections[iso];
-    saveState();
-    applySelectionStyles();
-    updateRemainingUI();
-    showDayDetails(new Date(iso));
-    showToast("Verlof verwijderd voor deze dag.");
-  }
-
   // --- Day details UI ---
   function showDayDetails(dateObj) {
     const dateIsoStr = isoDate(dateObj);
@@ -1315,7 +1317,6 @@
     const tEl = document.getElementById("detail-leave-type");
     const hrsEl = document.getElementById("detail-leave-hours");
     const halfEl = document.getElementById("detail-half");
-    const removeBtn = document.getElementById("remove-day-btn");
 
     const dd = String(dateObj.getDate()).padStart(2, "0");
     const mm = String(dateObj.getMonth() + 1).padStart(2, "0");
@@ -1338,7 +1339,6 @@
       tEl.textContent = "Geen";
       hrsEl.textContent = "–";
       halfEl.textContent = "–";
-      removeBtn.disabled = true;
     } else {
       let typeLabel = "";
       switch (sel.type) {
@@ -1358,10 +1358,10 @@
           typeLabel = "Wettelijk verlof";
           break;
       }
+      typeLabel += sel.half ? " – halve dag" : " – volledige dag";
       tEl.textContent = typeLabel;
       hrsEl.textContent = formatHours(sel.hours) + " u";
       halfEl.textContent = sel.half ? "Ja" : "Nee";
-      removeBtn.disabled = false;
     }
   }
 
@@ -1396,6 +1396,41 @@
     const adv2 = parseFloat(document.getElementById("adv2-hours").value) || 0;
     const adv3 = parseFloat(document.getElementById("adv3-hours").value) || 0;
     const adv4 = parseFloat(document.getElementById("adv4-hours").value) || 0;
+
+    // Check of er al meer uren ingepland zijn dan de nieuwe tellers toelaten
+    const used = computeUsedHours();
+    const warnings = [];
+
+    if (used.statutory > statutory) {
+      warnings.push(`- Wettelijk verlof: ingepland ${formatHours(used.statutory)} u > nieuwe teller ${formatHours(statutory)} u`);
+    }
+    if (used.replacement > replacement) {
+      warnings.push(`- Vervangende feestdagen: ingepland ${formatHours(used.replacement)} u > nieuwe teller ${formatHours(replacement)} u`);
+    }
+    if (used.regional > regional) {
+      warnings.push(`- Vlaamse Gemeenschap: ingepland ${formatHours(used.regional)} u > nieuwe teller ${formatHours(regional)} u`);
+    }
+    if (used.adv[0] > adv1) {
+      warnings.push(`- ADV Q1: ingepland ${formatHours(used.adv[0])} u > nieuwe teller ${formatHours(adv1)} u`);
+    }
+    if (used.adv[1] > adv2) {
+      warnings.push(`- ADV Q2: ingepland ${formatHours(used.adv[1])} u > nieuwe teller ${formatHours(adv2)} u`);
+    }
+    if (used.adv[2] > adv3) {
+      warnings.push(`- ADV Q3: ingepland ${formatHours(used.adv[2])} u > nieuwe teller ${formatHours(adv3)} u`);
+    }
+    if (used.adv[3] > adv4) {
+      warnings.push(`- ADV Q4: ingepland ${formatHours(used.adv[3])} u > nieuwe teller ${formatHours(adv4)} u`);
+    }
+
+    if (warnings.length > 0) {
+      const message =
+        "Op basis van de nieuwe tellers kom je in het rood voor één of meer soorten verlof:\n\n" +
+        warnings.join("\n") +
+        "\n\nWil je deze nieuwe tellers toch toepassen?";
+      const proceed = window.confirm(message);
+      if (!proceed) return;
+    }
 
     state.countersInitial = {
       statutory,
@@ -1433,6 +1468,7 @@
 
   function updateRemainingUI() {
     const rem = computeRemaining();
+
     const fields = [
       ["remaining-statutory", rem.statutory],
       ["remaining-replacement", rem.replacement],
@@ -1442,15 +1478,26 @@
       ["remaining-adv3", rem.adv[2]],
       ["remaining-adv4", rem.adv[3]],
     ];
+
     fields.forEach(([id, hours]) => {
-      document.getElementById(id).textContent =
-        `${formatHours(hours)} u (${floorDays(hours)} d)`;
+      const el = document.getElementById(id);
+      el.textContent = `${formatHours(hours)} u (${floorDays(hours)} d)`;
+      if (hours < 0) {
+        el.classList.add("negative");
+      } else {
+        el.classList.remove("negative");
+      }
     });
 
     const totalHours = rem.statutory + rem.replacement + rem.regional +
       rem.adv[0] + rem.adv[1] + rem.adv[2] + rem.adv[3];
-    document.getElementById("remaining-total").textContent =
-      `${formatHours(totalHours)} u (${floorDays(totalHours)} d)`;
+    const totalEl = document.getElementById("remaining-total");
+    totalEl.textContent = `${formatHours(totalHours)} u (${floorDays(totalHours)} d)`;
+    if (totalHours < 0) {
+      totalEl.classList.add("negative");
+    } else {
+      totalEl.classList.remove("negative");
+    }
   }
 
   // --- Year & PC dropdowns ---
@@ -1556,13 +1603,13 @@
     if (!stored || stored === "dark") {
       body.classList.remove("light-theme");
       if (btn) {
-        btn.innerHTML = "☀️<span>Dark mode</span>";
+        btn.innerHTML = "☀️<span>Lichte modus</span>";
         btn.setAttribute("aria-label", "Schakel naar lichte modus");
       }
     } else {
       body.classList.add("light-theme");
       if (btn) {
-        btn.innerHTML = "🌙<span>Light mode</span>";
+        btn.innerHTML = "🌙<span>Donkere modus</span>";
         btn.setAttribute("aria-label", "Schakel naar donkere modus");
       }
     }
@@ -1574,11 +1621,11 @@
     const isLight = body.classList.toggle("light-theme");
     if (isLight) {
       localStorage.setItem(THEME_KEY, "light");
-      btn.innerHTML = "🌙<span>Light mode</span>";
+      btn.innerHTML = "🌙<span>Donkere modus</span>";
       btn.setAttribute("aria-label", "Schakel naar donkere modus");
     } else {
       localStorage.setItem(THEME_KEY, "dark");
-      btn.innerHTML = "☀️<span>Dark mode</span>";
+      btn.innerHTML = "☀️<span>Lichte modus</span>";
       btn.setAttribute("aria-label", "Schakel naar lichte modus");
     }
   }
@@ -1631,7 +1678,6 @@
     document.getElementById("year-select").addEventListener("change", onYearChange);
     document.getElementById("pc-select").addEventListener("change", onPcChange);
 
-    document.getElementById("remove-day-btn").addEventListener("click", removeLeaveFromSelectedDay);
     document.getElementById("export-csv-btn").addEventListener("click", exportCsv);
     document.getElementById("reset-btn").addEventListener("click", resetStateConfirmation);
     document.getElementById("about-toggle-btn").addEventListener("click", toggleAbout);
@@ -1640,4 +1686,3 @@
 </script>
 </body>
 </html>
-
