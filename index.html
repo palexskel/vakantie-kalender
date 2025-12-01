@@ -5,23 +5,44 @@
   <title>Verlofkalender Simulator</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
+    /* =====================
+       KLEUREN & THEMA'S
+       ===================== */
+
+    /* Default = dark theme (WCAG-vriendelijk) */
     :root {
+      --bg: #121212;
+      --bg-alt: #1f1f26;
+      --border: #3a3a46;
+      --text: #f5f5f5;
+      --muted: #b0b0c2;
+      --accent: #ffb74d;
+      --accent-soft: #4d342f;
+      --error: #ef5350;
+      --weekend: #263238;
+      --holiday: #512525;
+      --regional: #4e3d18;
+      --grid-border: #42424f;
+      --cell-size: 1.9rem;
+      --radius: 0.5rem;
+      --input-radius: 0.35rem;
+      --shadow-soft: 0 2px 10px rgba(0,0,0,0.6);
+    }
+
+    body.light-theme {
       --bg: #f5f5f7;
       --bg-alt: #ffffff;
       --border: #d0d0d5;
       --text: #222222;
       --muted: #666666;
-      --accent: #ff9800;
+      --accent: #ef6c00;
       --accent-soft: #ffe0b2;
       --error: #d32f2f;
       --weekend: #e3f2fd;
       --holiday: #ffcdd2;
       --regional: #ffe082;
       --grid-border: #cccccc;
-      --cell-size: 2.3rem;
-      --radius: 0.4rem;
-      --shadow-soft: 0 2px 6px rgba(0,0,0,0.06);
-      --input-radius: 0.3rem;
+      --shadow-soft: 0 2px 6px rgba(0,0,0,0.08);
     }
 
     * {
@@ -33,6 +54,10 @@
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: var(--bg);
       color: var(--text);
+    }
+
+    a {
+      color: inherit;
     }
 
     .app {
@@ -52,6 +77,10 @@
       font-size: 0.95rem;
     }
 
+    /* =====================
+       TOP BAR
+       ===================== */
+
     .top-bar {
       display: flex;
       flex-wrap: wrap;
@@ -66,6 +95,10 @@
       gap: 0.25rem;
     }
 
+    .top-bar-spacer {
+      flex: 1;
+    }
+
     label {
       font-size: 0.85rem;
       color: var(--muted);
@@ -78,12 +111,43 @@
       background: var(--bg-alt);
       font-size: 0.9rem;
       min-width: 120px;
+      color: var(--text);
     }
 
     select:disabled, input:disabled {
+      background: #555555;
+      color: #dddddd;
+    }
+
+    body.light-theme select:disabled,
+    body.light-theme input:disabled {
       background: #eeeeee;
       color: #888888;
     }
+
+    .theme-toggle-btn {
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--bg-alt);
+      color: var(--text);
+      padding: 0.35rem 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      cursor: pointer;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .theme-toggle-btn span {
+      margin-left: 0.35rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    /* =====================
+       CARDS & BUTTONS
+       ===================== */
 
     .card {
       background: var(--bg-alt);
@@ -91,6 +155,7 @@
       box-shadow: var(--shadow-soft);
       padding: 1rem;
       margin-bottom: 1rem;
+      border: 1px solid var(--border);
     }
 
     .inputs-grid {
@@ -145,7 +210,7 @@
       padding: 0.35rem 0.9rem;
       cursor: pointer;
       background: var(--accent);
-      color: #ffffff;
+      color: #000000;
       display: inline-flex;
       align-items: center;
       gap: 0.35rem;
@@ -159,7 +224,7 @@
 
     .btn-danger {
       background: var(--error);
-      color: #fff;
+      color: #ffffff;
     }
 
     .btn:disabled {
@@ -183,27 +248,18 @@
       content: "🗑️";
     }
 
-    .calendar-layout {
-      display: grid;
-      grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
-      gap: 1rem;
-    }
-
-    @media (max-width: 900px) {
-      .calendar-layout {
-        grid-template-columns: 1fr;
-      }
-    }
+    /* =====================
+       KALENDER
+       ===================== */
 
     .calendar-wrapper {
-      overflow-x: auto;
+      overflow-x: visible;
     }
 
     .calendar-table {
       border-collapse: collapse;
-      width: max-content;
-      min-width: 100%;
-      font-size: 0.76rem;
+      width: 100%;
+      font-size: 0.75rem;
     }
 
     .calendar-table th,
@@ -216,32 +272,46 @@
     }
 
     .calendar-table th {
-      background: #eeeeee;
+      background: #2b2b35;
       font-weight: 600;
       position: sticky;
       top: 0;
       z-index: 2;
+      color: var(--text);
+    }
+
+    body.light-theme .calendar-table th {
+      background: #eeeeee;
+      color: #000000;
     }
 
     .month-cell {
-      background: #fafafa;
+      background: #2b2b35;
       font-weight: 600;
       position: sticky;
       left: 0;
       z-index: 1;
       min-width: 70px;
+      color: var(--text);
+    }
+
+    body.light-theme .month-cell {
+      background: #fafafa;
+      color: #000000;
     }
 
     .calendar-day {
       cursor: pointer;
       position: relative;
-      background: #ffffff;
+      background: var(--bg-alt);
       transition: background 0.12s ease, box-shadow 0.12s ease;
+      color: var(--text);
     }
 
     .calendar-day.weekend {
       background: var(--weekend);
       cursor: default;
+      color: var(--text);
     }
 
     .calendar-day.holiday-federal {
@@ -254,20 +324,28 @@
     }
 
     .calendar-day.empty {
-      background: #f0f0f0;
+      background: #303038;
       cursor: default;
+    }
+
+    body.light-theme .calendar-day.empty {
+      background: #f0f0f0;
     }
 
     .calendar-day.selected-full {
       background: var(--accent);
-      color: #ffffff;
-      box-shadow: inset 0 0 0 2px rgba(0,0,0,0.12);
+      color: #000000;
+      box-shadow: inset 0 0 0 2px rgba(0,0,0,0.25);
     }
 
     .calendar-day.selected-half {
       background: var(--accent-soft);
-      color: #000000;
+      color: #ffffff;
       box-shadow: inset 0 0 0 2px var(--accent);
+    }
+
+    body.light-theme .calendar-day.selected-half {
+      color: #000000;
     }
 
     .calendar-day.selected-half::after {
@@ -282,6 +360,10 @@
     .calendar-day.click-disabled {
       cursor: default;
     }
+
+    /* =====================
+       LEGENDE & SIDE PANEL
+       ===================== */
 
     .legend {
       display: flex;
@@ -305,7 +387,7 @@
     }
 
     .legend-workday {
-      background: #ffffff;
+      background: var(--bg-alt);
     }
 
     .legend-weekend {
@@ -333,6 +415,7 @@
       flex-direction: column;
       gap: 0.75rem;
       font-size: 0.86rem;
+      margin-top: 1rem;
     }
 
     .side-section-title {
@@ -362,6 +445,10 @@
       padding: 0.5rem 0.6rem;
       border-radius: var(--radius);
       border: 1px solid var(--border);
+      background: #191922;
+    }
+
+    body.light-theme .side-day-box {
       background: #fafafa;
     }
 
@@ -403,13 +490,17 @@
       display: block;
     }
 
+    /* =====================
+       TOAST
+       ===================== */
+
     .toast {
       position: fixed;
       bottom: 1rem;
       left: 50%;
       transform: translateX(-50%);
-      background: #333;
-      color: #fff;
+      background: #000000;
+      color: #ffffff;
       padding: 0.6rem 1rem;
       border-radius: 999px;
       font-size: 0.8rem;
@@ -422,6 +513,12 @@
     .toast.visible {
       opacity: 0.95;
       pointer-events: auto;
+    }
+
+    @media (max-width: 700px) {
+      .calendar-table {
+        font-size: 0.7rem;
+      }
     }
   </style>
 </head>
@@ -436,14 +533,18 @@
     <div class="top-bar-group">
       <label for="pc-select">Paritair comité</label>
       <select id="pc-select">
-        <option value="PC200">PC 200 - Aanvullend Paritair Comité</option>
-        <option value="PC306">PC 306 - Verzekeringswezen</option>
+        <option value="PC200">Holding (PC 200)</option>
+        <option value="PC306">Verzekeren (PC 306)</option>
       </select>
     </div>
     <div class="top-bar-group">
       <label for="year-select">Jaar</label>
       <select id="year-select"></select>
     </div>
+    <div class="top-bar-spacer"></div>
+    <button id="theme-toggle" class="theme-toggle-btn" aria-label="Schakel naar lichte modus">
+      ☀️<span>Dark mode</span>
+    </button>
   </div>
 
   <div class="card">
@@ -516,7 +617,7 @@
     </div>
   </div>
 
-  <div class="card calendar-layout">
+  <div class="card">
     <div class="calendar-wrapper">
       <table class="calendar-table" id="calendar-table" aria-label="Verlofkalender"></table>
       <div class="legend">
@@ -560,7 +661,7 @@
             <span class="side-value" id="detail-weekday">–</span>
           </div>
           <div class="side-field">
-            <span class="side-label">Feestdag</span>
+            <span classside-label">Feestdag</span>
             <span class="side-value" id="detail-holiday">–</span>
           </div>
           <div class="side-field">
@@ -614,6 +715,10 @@
             <span class="side-label">ADV Q4</span>
             <span class="side-value" id="remaining-adv4">0,00 u (0,0 d)</span>
           </div>
+          <div class="side-field" style="margin-top:0.35rem; border-top:1px dashed var(--border); padding-top:0.3rem;">
+            <span class="side-label">Totaal resterend</span>
+            <span class="side-value" id="remaining-total">0,00 u (0,0 d)</span>
+          </div>
         </div>
       </div>
 
@@ -642,15 +747,26 @@
       </div>
 
       <div id="about-content" class="about-content">
-        Deze tool is een simulator voor een persoonlijke verlofkalender. Je vult zelf je verschillende
-        vakantietellers in (wettelijk verlof, vervangende feestdagen, Vlaamse Gemeenschap en ADV per kwartaal)
-        en plaatst daarna verlofdagen in de kalender. De tool past automatisch de logica toe van PC 200 of
-        PC 306, inclusief het prioritaire gebruik van ADV-dagen en de beperking dat ADV pas kan worden
-        gebruikt vanaf het kwartaal waarin ze vrijkomen.<br><br>
-        <strong>Security & privacy:</strong> alle gegevens blijven volledig in je browser. Er wordt niets
-        doorgestuurd naar een server. De opgeslagen gegevens worden enkel in <code>localStorage</code> bewaard
-        zodat je planning beschikbaar blijft bij een volgende sessie. Via de reset-knop kun je alles in één klik
-        wissen.
+        Deze tool is een simulator voor een persoonlijke verlofkalender. Je kiest eerst het juiste paritair comité
+        (Holding – PC 200 of Verzekeren – PC 306) en het jaar. Daarna vul je de verschillende tellers in: wettelijk
+        verlof, vervangende feestdagen, Vlaamse Gemeenschap en ADV-uren per kwartaal (Q1 t.e.m. Q4). De tool zet
+        deze uren om in dagen en toont je meteen het totale saldo.<br><br>
+        Na het bevestigen van de tellers kun je verlofdagen in de kalender inplannen: een linkermuisklik zet een
+        volledige dag (7,33 u) om in verlof, een rechtermuisklik plant een halve dag (3,46 u) in. ADV-dagen worden
+        automatisch als eerste aangesproken en mogen pas gebruikt worden vanaf het kwartaal waarin ze vrijkomen.
+        De tool controleert of er voldoende saldo is en geeft een duidelijke foutmelding wanneer je probeert meer
+        verlof te plannen dan je beschikbaar hebt of ADV te gebruiken vóór de vrijgaveperiode. Weekenddagen en
+        wettelijke Belgische feestdagen zijn niet klikbaar. De regionale feestdag van de Vlaamse Gemeenschap
+        (11 juli) wordt apart aangeduid voor PC 306.<br><br>
+        Je ziet steeds een overzicht van de resterende uren en dagen per type verlof, samen met een totaalsaldo.
+        Je kunt ingeplande verlof op een dag verwijderen door de dag opnieuw aan te klikken of via de knop
+        “Verwijder verlof van deze dag”. Met de exportfunctie kun je je planning downloaden als CSV-bestand
+        (handig om verder te verwerken of door te geven aan HR).<br><br>
+        <strong>Security & privacy:</strong> alle gegevens blijven volledig in je browser. Er wordt niets doorgestuurd
+        naar een server of externe dienst. De gegevens (tellers, gekozen comité, jaar en geplande dagen) worden enkel
+        opgeslagen in <code>localStorage</code> op jouw toestel, zodat je planning bewaard blijft bij een volgende
+        sessie. Via de reset-knop kun je alles in één klik wissen. Dit maakt de tool veilig en privacyvriendelijk in
+        gebruik.
       </div>
     </div>
   </div>
@@ -663,6 +779,7 @@
   const HOURS_FULL_DAY = 7.33;
   const HOURS_HALF_DAY = 3.46;
   const STORAGE_PREFIX = "verlofSimulator_";
+  const THEME_KEY = "verlofSimulator_theme";
 
   const PC_CODES = {
     PC200: "PC200",
@@ -681,18 +798,14 @@
     year: new Date().getFullYear(),
     pcCode: PC_CODES.PC200,
     inputsLocked: false,
-    // Hours the user entered (initial capacity)
     countersInitial: {
       statutory: 0,
       replacement: 0,
       regional: 0,
-      adv: [0, 0, 0, 0], // Q1..Q4
+      adv: [0, 0, 0, 0],
     },
-    // Per-day usage
-    daySelections: {
-      // "YYYY-MM-DD": { type, hours, half, advBucket? }
-    },
-    holidays: [], // computed list of holiday objects for current year+pc
+    daySelections: {},
+    holidays: [],
   };
 
   // --- Utility helpers ---
@@ -711,23 +824,23 @@
   }
 
   function isWeekend(date) {
-    const d = date.getDay(); // 0=zo,6=za
+    const d = date.getDay();
     return d === 0 || d === 6;
   }
 
   function getAdvBucketForDate(date) {
-    const m = date.getMonth(); // 0-11
-    if (m <= 2) return 0; // jan-mrt
-    if (m <= 5) return 1; // apr-jun
-    if (m <= 8) return 2; // jul-sep
-    return 3; // okt-dec
+    const m = date.getMonth();
+    if (m <= 2) return 0;
+    if (m <= 5) return 1;
+    if (m <= 8) return 2;
+    return 3;
   }
 
   function getAdvBucketAvailableFrom(bucketIndex, year) {
-    if (bucketIndex === 0) return new Date(year, 0, 1); // 1 jan
-    if (bucketIndex === 1) return new Date(year, 3, 1); // 1 apr
-    if (bucketIndex === 2) return new Date(year, 6, 1); // 1 jul
-    return new Date(year, 9, 1); // 1 okt
+    if (bucketIndex === 0) return new Date(year, 0, 1);
+    if (bucketIndex === 1) return new Date(year, 3, 1);
+    if (bucketIndex === 2) return new Date(year, 6, 1);
+    return new Date(year, 9, 1);
   }
 
   function weekdayName(date) {
@@ -749,9 +862,8 @@
     setTimeout(() => toast.classList.remove("visible"), 2200);
   }
 
-  // --- Easter calculation and Belgian holidays ---
+  // --- Easter & holidays ---
   function getEasterDate(year) {
-    // Meeus/Jones/Butcher algorithm
     const a = year % 19;
     const b = Math.floor(year / 100);
     const c = year % 100;
@@ -764,7 +876,7 @@
     const k = c % 4;
     const l = (32 + 2 * e + 2 * i - h - k) % 7;
     const m = Math.floor((a + 11 * h + 22 * l) / 451);
-    const month = Math.floor((h + l - 7 * m + 114) / 31); // 3=March,4=April
+    const month = Math.floor((h + l - 7 * m + 114) / 31);
     const day = ((h + l - 7 * m + 114) % 31) + 1;
     return new Date(year, month - 1, day);
   }
@@ -782,11 +894,10 @@
       holidays.push({
         date: isoDate(date),
         name,
-        type, // "FEDERAL" | "REGIONAL"
+        type,
       });
     }
 
-    // Fixed federal holidays
     addHoliday(new Date(year, 0, 1), "Nieuwjaar", "FEDERAL");
     addHoliday(new Date(year, 4, 1), "Dag van de Arbeid", "FEDERAL");
     addHoliday(new Date(year, 6, 21), "Nationale feestdag", "FEDERAL");
@@ -795,13 +906,11 @@
     addHoliday(new Date(year, 10, 11), "Wapenstilstand", "FEDERAL");
     addHoliday(new Date(year, 11, 25), "Kerstmis", "FEDERAL");
 
-    // Movable federal holidays based on Easter
     const easter = getEasterDate(year);
     addHoliday(addDays(easter, 1), "Paasmaandag", "FEDERAL");
     addHoliday(addDays(easter, 39), "Onze-Lieve-Heer Hemelvaart", "FEDERAL");
     addHoliday(addDays(easter, 50), "Pinkstermaandag", "FEDERAL");
 
-    // Regional day: Vlaamse Gemeenschap (11 juli) – relevant voor PC306
     if (pcCode === PC_CODES.PC306) {
       addHoliday(new Date(year, 6, 11), "Feestdag Vlaamse Gemeenschap", "REGIONAL");
     }
@@ -817,7 +926,7 @@
     return map;
   }
 
-  // --- PC Rules (config) ---
+  // --- PC Rules ---
   function getPcRules(pcCode) {
     if (pcCode === PC_CODES.PC306) {
       return {
@@ -826,7 +935,7 @@
           return {
             statutory: 0,
             replacement: 0,
-            regional: HOURS_FULL_DAY, // 1 dag Vlaamse Gemeenschap
+            regional: HOURS_FULL_DAY, // 1 dag
             adv: [0, 0, 0, 0],
           };
         },
@@ -835,7 +944,6 @@
         },
       };
     }
-    // Default PC200
     return {
       code: PC_CODES.PC200,
       getDefaultCounters(year) {
@@ -887,7 +995,7 @@
       try {
         const parsed = JSON.parse(raw);
         state.inputsLocked = !!parsed.inputsLocked;
-        state.countersInitial = parsed.countersInitial || { statutory: 0, replacement: 0, regional: 0, adv: [0, 0, 0, 0] };
+        state.countersInitial = parsed.countersInitial || defaults;
         state.daySelections = parsed.daySelections || {};
       } catch (e) {
         console.warn("Kon state niet parsen, gebruik defaults:", e);
@@ -970,7 +1078,6 @@
     const months = monthNames();
     const daysHeader = document.createElement("tr");
 
-    // Empty corner cell
     const corner = document.createElement("th");
     corner.textContent = "";
     corner.className = "month-cell";
@@ -995,8 +1102,8 @@
 
       for (let d = 1; d <= 31; d++) {
         const cell = document.createElement("td");
-
         const dateObj = new Date(state.year, m, d);
+
         if (dateObj.getMonth() !== m) {
           cell.className = "calendar-day empty";
           cell.textContent = "";
@@ -1004,13 +1111,13 @@
           continue;
         }
 
-        const dateIso = isoDate(dateObj);
+        const dateIsoStr = isoDate(dateObj);
         cell.className = "calendar-day";
         cell.textContent = d.toString();
-        cell.dataset.date = dateIso;
+        cell.dataset.date = dateIsoStr;
 
         const isWE = isWeekend(dateObj);
-        const holiday = holidayMap[dateIso] || null;
+        const holiday = holidayMap[dateIsoStr] || null;
         if (isWE) {
           cell.classList.add("weekend", "click-disabled");
         }
@@ -1038,7 +1145,6 @@
       table.appendChild(row);
     }
 
-    // Apply existing selections
     applySelectionStyles();
   }
 
@@ -1049,8 +1155,8 @@
       cell.classList.remove("selected-full", "selected-half");
     });
 
-    Object.entries(state.daySelections).forEach(([dateIso, sel]) => {
-      const cell = table.querySelector(`.calendar-day[data-date="${dateIso}"]`);
+    Object.entries(state.daySelections).forEach(([dateIsoStr, sel]) => {
+      const cell = table.querySelector(`.calendar-day[data-date="${dateIsoStr}"]`);
       if (!cell) return;
       if (sel.half) {
         cell.classList.add("selected-half");
@@ -1060,7 +1166,7 @@
     });
   }
 
-  // --- Click logic ---
+  // --- Click logic (incl. toggle off) ---
   function onDayClick(event, dateObj, isRightClick) {
     event.preventDefault();
     const errorElement = document.getElementById("error-message");
@@ -1078,24 +1184,27 @@
       return;
     }
 
+    // Als er al verlof staat: toggle = verwijderen
+    if (state.daySelections[dateIsoStr]) {
+      delete state.daySelections[dateIsoStr];
+      saveState();
+      applySelectionStyles();
+      updateRemainingUI();
+      showDayDetails(dateObj);
+      showToast("Verlof verwijderd voor deze dag.");
+      return;
+    }
+
     const half = isRightClick;
     const neededHours = half ? HOURS_HALF_DAY : HOURS_FULL_DAY;
     const remaining = computeRemaining();
 
-    // If day already selected: just show details (no toggle) – user must use 'Verwijder' knop
-    if (state.daySelections[dateIsoStr]) {
-      showDayDetails(dateObj);
-      return;
-    }
-
-    // Determine leave source based on priority
     const pcRules = getPcRules(state.pcCode);
     const priority = pcRules.getLeavePriority();
 
     let chosenType = null;
     let chosenBucket = null;
 
-    // Build accessible ADV buckets (availableFrom <= date)
     const accessibleAdvBuckets = [];
     for (let i = 0; i < 4; i++) {
       const from = getAdvBucketAvailableFrom(i, state.year);
@@ -1137,7 +1246,6 @@
     }
 
     if (!chosenType) {
-      // Check if future ADV exists
       let earliestFuture = null;
       for (let i = 0; i < 4; i++) {
         const futureHours = remaining.adv[i];
@@ -1166,7 +1274,6 @@
       return;
     }
 
-    // All good: store selection
     state.daySelections[dateIsoStr] = {
       type: chosenType,
       hours: neededHours,
@@ -1182,19 +1289,18 @@
 
   function removeLeaveFromSelectedDay() {
     const detailDateEl = document.getElementById("detail-date");
-    const text = detailDateEl.dataset.iso;
-    if (!text) return;
-
-    if (!state.daySelections[text]) return;
+    const iso = detailDateEl.dataset.iso;
+    if (!iso || !state.daySelections[iso]) return;
 
     const yes = window.confirm("Verlof op deze dag verwijderen?");
     if (!yes) return;
 
-    delete state.daySelections[text];
+    delete state.daySelections[iso];
     saveState();
     applySelectionStyles();
     updateRemainingUI();
-    showDayDetails(new Date(text));
+    showDayDetails(new Date(iso));
+    showToast("Verlof verwijderd voor deze dag.");
   }
 
   // --- Day details UI ---
@@ -1340,6 +1446,11 @@
       document.getElementById(id).textContent =
         `${formatHours(hours)} u (${floorDays(hours)} d)`;
     });
+
+    const totalHours = rem.statutory + rem.replacement + rem.regional +
+      rem.adv[0] + rem.adv[1] + rem.adv[2] + rem.adv[3];
+    document.getElementById("remaining-total").textContent =
+      `${formatHours(totalHours)} u (${floorDays(totalHours)} d)`;
   }
 
   // --- Year & PC dropdowns ---
@@ -1384,12 +1495,11 @@
     const rows = [];
     rows.push(["date","weekday","type","hours","is_half_day","holiday_label"].join(";"));
 
-    // Sort by date
     entries.sort(([d1], [d2]) => d1.localeCompare(d2));
 
-    entries.forEach(([dateIso, sel]) => {
-      const dateObj = new Date(dateIso);
-      const holiday = holidayMap[dateIso];
+    entries.forEach(([dateIsoStr, sel]) => {
+      const dateObj = new Date(dateIsoStr);
+      const holiday = holidayMap[dateIsoStr];
       let typeLabel = "";
       switch (sel.type) {
         case LEAVE_TYPES.ADV:
@@ -1409,7 +1519,7 @@
           break;
       }
       const row = [
-        dateIso,
+        dateIsoStr,
         weekdayName(dateObj),
         typeLabel,
         sel.hours.toFixed(2).replace(".", ","),
@@ -1438,14 +1548,47 @@
     box.classList.toggle("visible");
   }
 
+  // --- Theme toggle ---
+  function applyStoredTheme() {
+    const stored = localStorage.getItem(THEME_KEY);
+    const body = document.body;
+    const btn = document.getElementById("theme-toggle");
+    if (!stored || stored === "dark") {
+      body.classList.remove("light-theme");
+      if (btn) {
+        btn.innerHTML = "☀️<span>Dark mode</span>";
+        btn.setAttribute("aria-label", "Schakel naar lichte modus");
+      }
+    } else {
+      body.classList.add("light-theme");
+      if (btn) {
+        btn.innerHTML = "🌙<span>Light mode</span>";
+        btn.setAttribute("aria-label", "Schakel naar donkere modus");
+      }
+    }
+  }
+
+  function toggleTheme() {
+    const body = document.body;
+    const btn = document.getElementById("theme-toggle");
+    const isLight = body.classList.toggle("light-theme");
+    if (isLight) {
+      localStorage.setItem(THEME_KEY, "light");
+      btn.innerHTML = "🌙<span>Light mode</span>";
+      btn.setAttribute("aria-label", "Schakel naar donkere modus");
+    } else {
+      localStorage.setItem(THEME_KEY, "dark");
+      btn.innerHTML = "☀️<span>Dark mode</span>";
+      btn.setAttribute("aria-label", "Schakel naar lichte modus");
+    }
+  }
+
   // --- Global UI update ---
   function updateUIFromState() {
-    // PC & year dropdown
     initYearSelect();
     document.getElementById("year-select").value = String(state.year);
     document.getElementById("pc-select").value = state.pcCode;
 
-    // Inputs
     document.getElementById("statutory-hours").value = state.countersInitial.statutory || 0;
     document.getElementById("replacement-hours").value = state.countersInitial.replacement || 0;
     document.getElementById("regional-hours").value = state.countersInitial.regional || 0;
@@ -1457,13 +1600,9 @@
     updateInputDaysLabels();
     updateInputsLockedUI();
 
-    // Calendar
     buildCalendarTable();
-
-    // Remaining
     updateRemainingUI();
 
-    // Clear errors & details
     document.getElementById("error-message").textContent = "";
     const now = new Date(state.year, 0, 1);
     showDayDetails(now);
@@ -1473,11 +1612,12 @@
   document.addEventListener("DOMContentLoaded", () => {
     const currentYear = new Date().getFullYear();
     const initialPc = document.getElementById("pc-select").value || PC_CODES.PC200;
+
     loadStateFor(currentYear, initialPc);
+    applyStoredTheme();
     initYearSelect();
     updateUIFromState();
 
-    // Inputs change
     [
       "statutory-hours","replacement-hours","regional-hours",
       "adv1-hours","adv2-hours","adv3-hours","adv4-hours",
@@ -1494,8 +1634,8 @@
     document.getElementById("remove-day-btn").addEventListener("click", removeLeaveFromSelectedDay);
     document.getElementById("export-csv-btn").addEventListener("click", exportCsv);
     document.getElementById("reset-btn").addEventListener("click", resetStateConfirmation);
-
     document.getElementById("about-toggle-btn").addEventListener("click", toggleAbout);
+    document.getElementById("theme-toggle").addEventListener("click", toggleTheme);
   });
 </script>
 </body>
