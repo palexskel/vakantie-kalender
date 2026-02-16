@@ -45,9 +45,7 @@
       --shadow-soft: 0 2px 6px rgba(0,0,0,0.08);
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -56,9 +54,7 @@
       color: var(--text);
     }
 
-    a {
-      color: inherit;
-    }
+    a { color: inherit; }
 
     .app {
       max-width: 1200px;
@@ -95,9 +91,7 @@
       gap: 0.25rem;
     }
 
-    .top-bar-spacer {
-      flex: 1;
-    }
+    .top-bar-spacer { flex: 1; }
 
     label {
       font-size: 0.85rem;
@@ -177,9 +171,7 @@
       align-items: center;
     }
 
-    .input-row input {
-      flex: 1;
-    }
+    .input-row input { flex: 1; }
 
     .days-hint {
       font-size: 0.8rem;
@@ -199,9 +191,7 @@
       align-items: center;
     }
 
-    .totals-row span {
-      white-space: nowrap;
-    }
+    .totals-row span { white-space: nowrap; }
 
     .btn, button {
       font-size: 0.85rem;
@@ -232,29 +222,16 @@
       cursor: not-allowed;
     }
 
-    .icon-pencil::before {
-      content: "✏️";
-    }
-
-    .icon-info::before {
-      content: "ℹ️";
-    }
-
-    .icon-download::before {
-      content: "⬇️";
-    }
-
-    .icon-reset::before {
-      content: "🗑️";
-    }
+    .icon-pencil::before { content: "✏️"; }
+    .icon-info::before { content: "ℹ️"; }
+    .icon-download::before { content: "⬇️"; }
+    .icon-reset::before { content: "🗑️"; }
 
     /* =====================
        KALENDER
        ===================== */
 
-    .calendar-wrapper {
-      overflow-x: visible;
-    }
+    .calendar-wrapper { overflow-x: visible; }
 
     .calendar-help {
       font-size: 0.8rem;
@@ -350,9 +327,7 @@
       box-shadow: inset 0 0 0 2px var(--accent);
     }
 
-    body.light-theme .calendar-day.selected-half {
-      color: #000000;
-    }
+    body.light-theme .calendar-day.selected-half { color: #000000; }
 
     .calendar-day.selected-half::after {
       content: "½";
@@ -363,9 +338,7 @@
       opacity: 0.9;
     }
 
-    .calendar-day.click-disabled {
-      cursor: default;
-    }
+    .calendar-day.click-disabled { cursor: default; }
 
     /* Shake effect bij mislukte klik */
     @keyframes shake {
@@ -376,9 +349,7 @@
       100% { transform: translateX(0); }
     }
 
-    .calendar-day.shake {
-      animation: shake 0.2s linear;
-    }
+    .calendar-day.shake { animation: shake 0.2s linear; }
 
     /* =====================
        LEGENDE & SIDE PANEL
@@ -405,29 +376,12 @@
       border: 1px solid var(--grid-border);
     }
 
-    .legend-workday {
-      background: var(--bg-alt);
-    }
-
-    .legend-weekend {
-      background: var(--weekend);
-    }
-
-    .legend-holiday {
-      background: var(--holiday);
-    }
-
-    .legend-regional {
-      background: var(--regional);
-    }
-
-    .legend-selected-full {
-      background: var(--accent);
-    }
-
-    .legend-selected-half {
-      background: var(--accent-soft);
-    }
+    .legend-workday { background: var(--bg-alt); }
+    .legend-weekend { background: var(--weekend); }
+    .legend-holiday { background: var(--holiday); }
+    .legend-regional { background: var(--regional); }
+    .legend-selected-full { background: var(--accent); }
+    .legend-selected-half { background: var(--accent-soft); }
 
     .side-panel {
       display: flex;
@@ -448,17 +402,10 @@
       gap: 0.75rem;
     }
 
-    .side-field span {
-      font-size: 0.85rem;
-    }
+    .side-field span { font-size: 0.85rem; }
 
-    .side-label {
-      color: var(--muted);
-    }
-
-    .side-value {
-      font-weight: 500;
-    }
+    .side-label { color: var(--muted); }
+    .side-value { font-weight: 500; }
 
     .side-day-box {
       padding: 0.5rem 0.6rem;
@@ -467,9 +414,7 @@
       background: #191922;
     }
 
-    body.light-theme .side-day-box {
-      background: #fafafa;
-    }
+    body.light-theme .side-day-box { background: #fafafa; }
 
     .error-text {
       color: var(--error);
@@ -486,13 +431,9 @@
       color: var(--muted);
     }
 
-    .footer-right {
-      font-weight: 500;
-    }
+    .footer-right { font-weight: 500; }
 
-    .about-toggle {
-      margin-top: 0.75rem;
-    }
+    .about-toggle { margin-top: 0.75rem; }
 
     .about-content {
       margin-top: 0.5rem;
@@ -505,9 +446,7 @@
       display: none;
     }
 
-    .about-content.visible {
-      display: block;
-    }
+    .about-content.visible { display: block; }
 
     /* Negatieve saldi visueel aanduiden */
     .negative {
@@ -541,9 +480,7 @@
     }
 
     @media (max-width: 700px) {
-      .calendar-table {
-        font-size: 0.7rem;
-      }
+      .calendar-table { font-size: 0.7rem; }
     }
   </style>
 </head>
@@ -596,6 +533,15 @@
         </div>
       </div>
 
+      <!-- NIEUW: Ancieniteitsverlof -->
+      <div class="input-item">
+        <label for="seniority-hours">Ancieniteitsverlof (uren)</label>
+        <div class="input-row">
+          <input type="number" id="seniority-hours" min="0" step="0.01" value="0" />
+          <span class="days-hint" id="seniority-days-label">0,0 dagen</span>
+        </div>
+      </div>
+
       <div class="input-item">
         <label for="adv1-hours">ADV1 (Q1) uren</label>
         <div class="input-row">
@@ -644,8 +590,8 @@
 
   <div class="card">
     <div class="calendar-wrapper">
-      <p class="calendar-help">
-        Linkermuisklik = volledige dag (7,33 u) · Rechtermuisklik = halve dag (3,46 u) · Op een geselecteerde dag opnieuw klikken verwijdert het verlof.
+      <p class="calendar-help" id="calendar-help">
+        Linkermuisklik = volledige dag · Rechtermuisklik = halve dag · Op een geselecteerde dag opnieuw klikken verwijdert het verlof.
       </p>
       <table class="calendar-table" id="calendar-table" aria-label="Verlofkalender"></table>
       <div class="legend">
@@ -722,6 +668,13 @@
             <span class="side-label">Vlaamse Gemeenschap</span>
             <span class="side-value" id="remaining-regional">0,00 u (0,0 d)</span>
           </div>
+
+          <!-- NIEUW: Ancieniteitsverlof -->
+          <div class="side-field">
+            <span class="side-label">Ancieniteitsverlof</span>
+            <span class="side-value" id="remaining-seniority">0,00 u (0,0 d)</span>
+          </div>
+
           <div class="side-field">
             <span class="side-label">ADV Q1</span>
             <span class="side-value" id="remaining-adv1">0,00 u (0,0 d)</span>
@@ -772,11 +725,13 @@
       <div id="about-content" class="about-content">
         Deze tool is een simulator voor een persoonlijke verlofkalender. Je kiest eerst het juiste paritair comité
         (Holding – PC 200 of Verzekeren – PC 306) en het jaar. Daarna vul je de verschillende tellers in: wettelijk
-        verlof, vervangende feestdagen, Vlaamse Gemeenschap en ADV-uren per kwartaal (Q1 t.e.m. Q4). De tool zet
-        deze uren om in dagen en toont je meteen het totale saldo.<br><br>
+        verlof, vervangende feestdagen, Vlaamse Gemeenschap, ancieniteitsverlof en ADV-uren per kwartaal (Q1 t.e.m. Q4).
+        De tool zet deze uren om in dagen en toont je meteen het totale saldo.<br><br>
         Na het bevestigen van de tellers kun je verlofdagen in de kalender inplannen: een linkermuisklik zet een
-        volledige dag (7,33 u) om in verlof, een rechtermuisklik plant een halve dag (3,46 u) in. ADV-dagen worden
-        automatisch als eerste aangesproken en mogen pas gebruikt worden vanaf het kwartaal waarin ze vrijkomen.
+        volledige dag om in verlof, een rechtermuisklik plant een halve dag in. Het aantal uren per dag is dynamisch
+        volgens je paritair comité (PC 200: 7,6u / 3,8u · PC 306: 7,2u / 3,6u). ADV-dagen worden automatisch als eerste
+        aangesproken en mogen pas gebruikt worden vanaf het kwartaal waarin ze vrijkomen. Daarna geldt de volgorde:
+        Vlaamse Gemeenschap → Ancieniteit → Vervangend → Wettelijk.
         De tool controleert of er voldoende saldo is en geeft een duidelijke foutmelding wanneer je probeert meer
         verlof te plannen dan je beschikbaar hebt of ADV te gebruiken vóór de vrijgaveperiode. Weekenddagen en
         wettelijke Belgische feestdagen zijn niet klikbaar. De regionale feestdag van de Vlaamse Gemeenschap
@@ -798,9 +753,14 @@
 <div id="toast" class="toast"></div>
 
 <script>
-  // --- Constants ---
-  const HOURS_FULL_DAY = 7.33;
-  const HOURS_HALF_DAY = 3.46;
+  // =========================
+  // BUGFIXES:
+  // 1) Timezone bug opgelost: GEEN toISOString() meer voor keys. Alles in lokale YYYY-MM-DD.
+  // 2) CSV/date parsing bug opgelost: GEEN new Date('YYYY-MM-DD') meer (UTC interpretatie).
+  // 3) Afrondingsrobustheid: intern centi-uren + floorDays met nette negatieve afronding.
+  // =========================
+
+  // --- Storage ---
   const STORAGE_PREFIX = "verlofSimulator_";
   const THEME_KEY = "verlofSimulator_theme";
 
@@ -809,9 +769,48 @@
     PC306: "PC306",
   };
 
+  // Verplicht: dynamische daguren per PC
+  function getDayHours(pcCode) {
+    return pcCode === "PC306"
+      ? { full: 7.2, half: 3.6 }
+      : { full: 7.6, half: 3.8 };
+  }
+
+  // Helpers: centi-uren conversies (exact)
+  function toCentiHours(numHours) {
+    const n = Number(numHours);
+    if (!isFinite(n) || n <= 0) return 0;
+    return Math.round(n * 100);
+  }
+
+  function fromCentiHours(ch) {
+    return (ch || 0) / 100;
+  }
+
+  function getDayHoursCH(pcCode) {
+    const dh = getDayHours(pcCode);
+    return { full: toCentiHours(dh.full), half: toCentiHours(dh.half) };
+  }
+
+  // TIMEZONE-SAFE: lokale ISO key
+  function isoDateLocal(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  }
+
+  // TIMEZONE-SAFE: parse lokale ISO -> Date(y,m-1,d)
+  function parseIsoLocal(iso) {
+    const [y, m, d] = iso.split("-").map(Number);
+    return new Date(y, m - 1, d);
+  }
+
+  // --- Leave types ---
   const LEAVE_TYPES = {
     ADV: "ADV",
     REGIONAL: "REGIONAL",
+    SENIORITY: "SENIORITY",
     REPLACEMENT: "REPLACEMENT",
     STATUTORY: "STATUTORY",
   };
@@ -822,28 +821,29 @@
     pcCode: PC_CODES.PC200,
     inputsLocked: false,
     countersInitial: {
-      statutory: 0,
-      replacement: 0,
-      regional: 0,
-      adv: [0, 0, 0, 0],
+      statutoryCH: 0,
+      replacementCH: 0,
+      regionalCH: 0,
+      seniorityCH: 0,
+      advCH: [0, 0, 0, 0],
     },
-    daySelections: {},
+    daySelections: {}, // { [YYYY-MM-DD]: { type, hoursCH, half, advBucket? } }
     holidays: [],
   };
 
   // --- Utility helpers ---
-  function formatHours(h) {
-    return (Math.round(h * 100) / 100).toFixed(2).replace(".", ",");
+  function formatHoursCH(ch) {
+    return (fromCentiHours(ch)).toFixed(2).replace(".", ",");
   }
 
-  function floorDays(hours) {
-    const days = hours / HOURS_FULL_DAY;
-    const floored = Math.floor(days * 10) / 10;
-    return floored.toFixed(1).replace(".", ",");
-  }
-
-  function isoDate(date) {
-    return date.toISOString().split("T")[0];
+  // Verplicht: floorDays gebruikt dynamische full-day uren
+  // Bugfix: negatieve uren netjes afronden richting 0 i.p.v. "meer negatief" door Math.floor
+  function floorDaysCH(hoursCH) {
+    const dayCH = getDayHoursCH(state.pcCode).full;
+    if (!dayCH) return "0,0";
+    const raw = (hoursCH * 10) / dayCH;
+    const days10 = (hoursCH >= 0) ? Math.floor(raw) : Math.ceil(raw);
+    return (days10 / 10).toFixed(1).replace(".", ",");
   }
 
   function isWeekend(date) {
@@ -877,6 +877,15 @@
     setTimeout(() => toast.classList.remove("visible"), 2200);
   }
 
+  function updateCalendarHelpText() {
+    const helpEl = document.getElementById("calendar-help");
+    const dh = getDayHours(state.pcCode);
+    const full = String(dh.full).replace(".", ",");
+    const half = String(dh.half).replace(".", ",");
+    helpEl.textContent =
+      `Linkermuisklik = volledige dag (${full} u) · Rechtermuisklik = halve dag (${half} u) · Op een geselecteerde dag opnieuw klikken verwijdert het verlof.`;
+  }
+
   // --- Easter & holidays ---
   function getEasterDate(year) {
     const a = year % 19;
@@ -907,7 +916,7 @@
 
     function addHoliday(date, name, type) {
       holidays.push({
-        date: isoDate(date),
+        date: isoDateLocal(date), // BUGFIX: local iso
         name,
         type,
       });
@@ -935,9 +944,7 @@
 
   function getHolidayMap() {
     const map = {};
-    state.holidays.forEach(h => {
-      map[h.date] = h;
-    });
+    state.holidays.forEach(h => { map[h.date] = h; });
     return map;
   }
 
@@ -947,15 +954,17 @@
       return {
         code: PC_CODES.PC306,
         getDefaultCounters(year) {
+          const dayCH = getDayHoursCH(pcCode).full;
           return {
-            statutory: 0,
-            replacement: 0,
-            regional: HOURS_FULL_DAY, // 1 dag
-            adv: [0, 0, 0, 0],
+            statutoryCH: 0,
+            replacementCH: 0,
+            regionalCH: dayCH, // 1 dag (PC306)
+            seniorityCH: 0,
+            advCH: [0, 0, 0, 0],
           };
         },
         getLeavePriority() {
-          return [LEAVE_TYPES.ADV, LEAVE_TYPES.REGIONAL, LEAVE_TYPES.REPLACEMENT, LEAVE_TYPES.STATUTORY];
+          return [LEAVE_TYPES.ADV, LEAVE_TYPES.REGIONAL, LEAVE_TYPES.SENIORITY, LEAVE_TYPES.REPLACEMENT, LEAVE_TYPES.STATUTORY];
         },
       };
     }
@@ -963,14 +972,15 @@
       code: PC_CODES.PC200,
       getDefaultCounters(year) {
         return {
-          statutory: 0,
-          replacement: 0,
-          regional: 0,
-          adv: [0, 0, 0, 0],
+          statutoryCH: 0,
+          replacementCH: 0,
+          regionalCH: 0,
+          seniorityCH: 0,
+          advCH: [0, 0, 0, 0],
         };
       },
       getLeavePriority() {
-        return [LEAVE_TYPES.ADV, LEAVE_TYPES.REGIONAL, LEAVE_TYPES.REPLACEMENT, LEAVE_TYPES.STATUTORY];
+        return [LEAVE_TYPES.ADV, LEAVE_TYPES.REGIONAL, LEAVE_TYPES.SENIORITY, LEAVE_TYPES.REPLACEMENT, LEAVE_TYPES.STATUTORY];
       },
     };
   }
@@ -996,6 +1006,56 @@
     }
   }
 
+  // Migratie: oude floats (uren) -> centi-uren
+  function migrateCountersIfNeeded(rawCounters) {
+    if (!rawCounters || typeof rawCounters !== "object") return null;
+
+    if ("statutoryCH" in rawCounters || "advCH" in rawCounters) {
+      if (!("seniorityCH" in rawCounters)) rawCounters.seniorityCH = 0;
+      if (!Array.isArray(rawCounters.advCH) || rawCounters.advCH.length !== 4) rawCounters.advCH = [0,0,0,0];
+      return rawCounters;
+    }
+
+    const statutoryCH = toCentiHours(rawCounters.statutory || 0);
+    const replacementCH = toCentiHours(rawCounters.replacement || 0);
+    const regionalCH = toCentiHours(rawCounters.regional || 0);
+    const advArr = Array.isArray(rawCounters.adv) ? rawCounters.adv : [0,0,0,0];
+    const advCH = [
+      toCentiHours(advArr[0] || 0),
+      toCentiHours(advArr[1] || 0),
+      toCentiHours(advArr[2] || 0),
+      toCentiHours(advArr[3] || 0),
+    ];
+    return { statutoryCH, replacementCH, regionalCH, seniorityCH: 0, advCH };
+  }
+
+  function migrateSelectionsIfNeeded(rawSelections) {
+    if (!rawSelections || typeof rawSelections !== "object") return {};
+    const migrated = {};
+    for (const [k, v] of Object.entries(rawSelections)) {
+      if (!v || typeof v !== "object") continue;
+
+      if ("hoursCH" in v) {
+        migrated[k] = {
+          type: v.type,
+          hoursCH: Number(v.hoursCH) || 0,
+          half: !!v.half,
+          advBucket: (typeof v.advBucket === "number") ? v.advBucket : undefined,
+        };
+        continue;
+      }
+
+      const hoursCH = toCentiHours(v.hours || 0);
+      migrated[k] = {
+        type: v.type,
+        hoursCH,
+        half: !!v.half,
+        advBucket: (typeof v.advBucket === "number") ? v.advBucket : undefined,
+      };
+    }
+    return migrated;
+  }
+
   function loadStateFor(year, pcCode) {
     const key = storageKey(year, pcCode);
     const raw = localStorage.getItem(key);
@@ -1010,8 +1070,18 @@
       try {
         const parsed = JSON.parse(raw);
         state.inputsLocked = !!parsed.inputsLocked;
-        state.countersInitial = parsed.countersInitial || defaults;
-        state.daySelections = parsed.daySelections || {};
+
+        const migratedCounters = migrateCountersIfNeeded(parsed.countersInitial);
+        state.countersInitial = migratedCounters || defaults;
+
+        state.daySelections = migrateSelectionsIfNeeded(parsed.daySelections);
+
+        if (!state.countersInitial.advCH || state.countersInitial.advCH.length !== 4) {
+          state.countersInitial.advCH = defaults.advCH.slice();
+        }
+        if (!("seniorityCH" in state.countersInitial)) {
+          state.countersInitial.seniorityCH = 0;
+        }
       } catch (e) {
         console.warn("Kon state niet parsen, gebruik defaults:", e);
         state.inputsLocked = false;
@@ -1040,28 +1110,32 @@
   }
 
   // --- Remaining counters ---
-  function computeUsedHours() {
+  function computeUsedHoursCH() {
     const used = {
-      statutory: 0,
-      replacement: 0,
-      regional: 0,
-      adv: [0, 0, 0, 0],
+      statutoryCH: 0,
+      replacementCH: 0,
+      regionalCH: 0,
+      seniorityCH: 0,
+      advCH: [0, 0, 0, 0],
     };
 
     Object.values(state.daySelections).forEach(sel => {
       switch (sel.type) {
         case LEAVE_TYPES.STATUTORY:
-          used.statutory += sel.hours;
+          used.statutoryCH += sel.hoursCH;
           break;
         case LEAVE_TYPES.REPLACEMENT:
-          used.replacement += sel.hours;
+          used.replacementCH += sel.hoursCH;
           break;
         case LEAVE_TYPES.REGIONAL:
-          used.regional += sel.hours;
+          used.regionalCH += sel.hoursCH;
+          break;
+        case LEAVE_TYPES.SENIORITY:
+          used.seniorityCH += sel.hoursCH;
           break;
         case LEAVE_TYPES.ADV:
           if (typeof sel.advBucket === "number") {
-            used.adv[sel.advBucket] += sel.hours;
+            used.advCH[sel.advBucket] += sel.hoursCH;
           }
           break;
       }
@@ -1070,17 +1144,18 @@
     return used;
   }
 
-  function computeRemaining() {
-    const used = computeUsedHours();
+  function computeRemainingCH() {
+    const used = computeUsedHoursCH();
     return {
-      statutory: state.countersInitial.statutory - used.statutory,
-      replacement: state.countersInitial.replacement - used.replacement,
-      regional: state.countersInitial.regional - used.regional,
-      adv: [
-        state.countersInitial.adv[0] - used.adv[0],
-        state.countersInitial.adv[1] - used.adv[1],
-        state.countersInitial.adv[2] - used.adv[2],
-        state.countersInitial.adv[3] - used.adv[3],
+      statutoryCH: state.countersInitial.statutoryCH - used.statutoryCH,
+      replacementCH: state.countersInitial.replacementCH - used.replacementCH,
+      regionalCH: state.countersInitial.regionalCH - used.regionalCH,
+      seniorityCH: state.countersInitial.seniorityCH - used.seniorityCH,
+      advCH: [
+        state.countersInitial.advCH[0] - used.advCH[0],
+        state.countersInitial.advCH[1] - used.advCH[1],
+        state.countersInitial.advCH[2] - used.advCH[2],
+        state.countersInitial.advCH[3] - used.advCH[3],
       ],
     };
   }
@@ -1126,7 +1201,7 @@
           continue;
         }
 
-        const dateIsoStr = isoDate(dateObj);
+        const dateIsoStr = isoDateLocal(dateObj); // BUGFIX: local iso
         cell.className = "calendar-day";
         cell.textContent = d.toString();
         cell.dataset.date = dateIsoStr;
@@ -1141,6 +1216,7 @@
             cell.classList.add("holiday-federal", "click-disabled");
           } else if (holiday.type === "REGIONAL") {
             cell.classList.add("holiday-regional");
+            // opzettelijk NIET click-disabled (zelfde gedrag als jouw vorige versie)
           }
           cell.title = holiday.name;
         }
@@ -1173,11 +1249,8 @@
     Object.entries(state.daySelections).forEach(([dateIsoStr, sel]) => {
       const cell = table.querySelector(`.calendar-day[data-date="${dateIsoStr}"]`);
       if (!cell) return;
-      if (sel.half) {
-        cell.classList.add("selected-half");
-      } else {
-        cell.classList.add("selected-full");
-      }
+      if (sel.half) cell.classList.add("selected-half");
+      else cell.classList.add("selected-full");
     });
   }
 
@@ -1187,19 +1260,17 @@
     const errorElement = document.getElementById("error-message");
     errorElement.textContent = "";
 
-    const dateIsoStr = isoDate(dateObj);
+    const dateIsoStr = isoDateLocal(dateObj);
     const table = document.getElementById("calendar-table");
     const cell = table.querySelector(`.calendar-day[data-date="${dateIsoStr}"]`);
-    if (!cell || cell.classList.contains("click-disabled")) {
-      return;
-    }
+    if (!cell || cell.classList.contains("click-disabled")) return;
 
     if (!state.inputsLocked) {
       showToast("Bevestig eerst de tellers voordat je verlof inplant.");
       return;
     }
 
-    // Toggle: als er al verlof is, verwijderen bij tweede klik
+    // Toggle: verwijderen bij tweede klik
     if (state.daySelections[dateIsoStr]) {
       delete state.daySelections[dateIsoStr];
       saveState();
@@ -1210,10 +1281,12 @@
       return;
     }
 
+    // Verplicht: neededHours dynamisch per PC
+    const dayHours = getDayHoursCH(state.pcCode);
     const half = isRightClick;
-    const neededHours = half ? HOURS_HALF_DAY : HOURS_FULL_DAY;
-    const remaining = computeRemaining();
+    const neededHoursCH = half ? dayHours.half : dayHours.full;
 
+    const remaining = computeRemainingCH();
     const pcRules = getPcRules(state.pcCode);
     const priority = pcRules.getLeavePriority();
 
@@ -1232,7 +1305,7 @@
       if (type === LEAVE_TYPES.ADV) {
         let bestBucket = null;
         for (const b of accessibleAdvBuckets) {
-          if (remaining.adv[b] >= neededHours) {
+          if (remaining.advCH[b] >= neededHoursCH) {
             bestBucket = b;
             break;
           }
@@ -1243,17 +1316,22 @@
           break;
         }
       } else if (type === LEAVE_TYPES.REGIONAL) {
-        if (remaining.regional >= neededHours) {
+        if (remaining.regionalCH >= neededHoursCH) {
           chosenType = LEAVE_TYPES.REGIONAL;
           break;
         }
+      } else if (type === LEAVE_TYPES.SENIORITY) {
+        if (remaining.seniorityCH >= neededHoursCH) {
+          chosenType = LEAVE_TYPES.SENIORITY;
+          break;
+        }
       } else if (type === LEAVE_TYPES.REPLACEMENT) {
-        if (remaining.replacement >= neededHours) {
+        if (remaining.replacementCH >= neededHoursCH) {
           chosenType = LEAVE_TYPES.REPLACEMENT;
           break;
         }
       } else if (type === LEAVE_TYPES.STATUTORY) {
-        if (remaining.statutory >= neededHours) {
+        if (remaining.statutoryCH >= neededHoursCH) {
           chosenType = LEAVE_TYPES.STATUTORY;
           break;
         }
@@ -1263,7 +1341,7 @@
     if (!chosenType) {
       let earliestFuture = null;
       for (let i = 0; i < 4; i++) {
-        const futureHours = remaining.adv[i];
+        const futureHours = remaining.advCH[i];
         if (futureHours > 0) {
           const from = getAdvBucketAvailableFrom(i, state.year);
           if (from.getTime() > dateObj.getTime()) {
@@ -1285,7 +1363,7 @@
         errorElement.textContent =
           "Je hebt niet genoeg resterende verlofuren om deze dag in te plannen.";
       }
-      // Visuele feedback
+
       cell.classList.add("shake");
       setTimeout(() => cell.classList.remove("shake"), 200);
       showToast("Verlof kan niet ingepland worden op deze datum.");
@@ -1294,7 +1372,7 @@
 
     state.daySelections[dateIsoStr] = {
       type: chosenType,
-      hours: neededHours,
+      hoursCH: neededHoursCH,
       half: half,
       advBucket: chosenType === LEAVE_TYPES.ADV ? chosenBucket : undefined,
     };
@@ -1307,7 +1385,7 @@
 
   // --- Day details UI ---
   function showDayDetails(dateObj) {
-    const dateIsoStr = isoDate(dateObj);
+    const dateIsoStr = isoDateLocal(dateObj);
     const holidayMap = getHolidayMap();
     const sel = state.daySelections[dateIsoStr] || null;
 
@@ -1344,12 +1422,13 @@
       switch (sel.type) {
         case LEAVE_TYPES.ADV:
           typeLabel = "ADV";
-          if (typeof sel.advBucket === "number") {
-            typeLabel += ` (Q${sel.advBucket + 1})`;
-          }
+          if (typeof sel.advBucket === "number") typeLabel += ` (Q${sel.advBucket + 1})`;
           break;
         case LEAVE_TYPES.REGIONAL:
           typeLabel = "Vlaamse Gemeenschap";
+          break;
+        case LEAVE_TYPES.SENIORITY:
+          typeLabel = "Ancieniteitsverlof";
           break;
         case LEAVE_TYPES.REPLACEMENT:
           typeLabel = "Vervangende feestdag";
@@ -1360,67 +1439,72 @@
       }
       typeLabel += sel.half ? " – halve dag" : " – volledige dag";
       tEl.textContent = typeLabel;
-      hrsEl.textContent = formatHours(sel.hours) + " u";
+      hrsEl.textContent = formatHoursCH(sel.hoursCH) + " u";
       halfEl.textContent = sel.half ? "Ja" : "Nee";
     }
   }
 
   // --- Inputs & totals ---
   function updateInputDaysLabels() {
-    const statutory = parseFloat(document.getElementById("statutory-hours").value) || 0;
-    const replacement = parseFloat(document.getElementById("replacement-hours").value) || 0;
-    const regional = parseFloat(document.getElementById("regional-hours").value) || 0;
-    const adv1 = parseFloat(document.getElementById("adv1-hours").value) || 0;
-    const adv2 = parseFloat(document.getElementById("adv2-hours").value) || 0;
-    const adv3 = parseFloat(document.getElementById("adv3-hours").value) || 0;
-    const adv4 = parseFloat(document.getElementById("adv4-hours").value) || 0;
+    const statutoryCH = toCentiHours(document.getElementById("statutory-hours").value);
+    const replacementCH = toCentiHours(document.getElementById("replacement-hours").value);
+    const regionalCH = toCentiHours(document.getElementById("regional-hours").value);
+    const seniorityCH = toCentiHours(document.getElementById("seniority-hours").value);
+    const adv1CH = toCentiHours(document.getElementById("adv1-hours").value);
+    const adv2CH = toCentiHours(document.getElementById("adv2-hours").value);
+    const adv3CH = toCentiHours(document.getElementById("adv3-hours").value);
+    const adv4CH = toCentiHours(document.getElementById("adv4-hours").value);
 
-    document.getElementById("statutory-days-label").textContent = `${floorDays(statutory)} dagen`;
-    document.getElementById("replacement-days-label").textContent = `${floorDays(replacement)} dagen`;
-    document.getElementById("regional-days-label").textContent = `${floorDays(regional)} dagen`;
-    document.getElementById("adv1-days-label").textContent = `${floorDays(adv1)} dagen`;
-    document.getElementById("adv2-days-label").textContent = `${floorDays(adv2)} dagen`;
-    document.getElementById("adv3-days-label").textContent = `${floorDays(adv3)} dagen`;
-    document.getElementById("adv4-days-label").textContent = `${floorDays(adv4)} dagen`;
+    document.getElementById("statutory-days-label").textContent = `${floorDaysCH(statutoryCH)} dagen`;
+    document.getElementById("replacement-days-label").textContent = `${floorDaysCH(replacementCH)} dagen`;
+    document.getElementById("regional-days-label").textContent = `${floorDaysCH(regionalCH)} dagen`;
+    document.getElementById("seniority-days-label").textContent = `${floorDaysCH(seniorityCH)} dagen`;
+    document.getElementById("adv1-days-label").textContent = `${floorDaysCH(adv1CH)} dagen`;
+    document.getElementById("adv2-days-label").textContent = `${floorDaysCH(adv2CH)} dagen`;
+    document.getElementById("adv3-days-label").textContent = `${floorDaysCH(adv3CH)} dagen`;
+    document.getElementById("adv4-days-label").textContent = `${floorDaysCH(adv4CH)} dagen`;
 
-    const totalHours = statutory + replacement + regional + adv1 + adv2 + adv3 + adv4;
-    document.getElementById("total-hours-label").textContent = `Totaal: ${formatHours(totalHours)} uur`;
-    document.getElementById("total-days-label").textContent = `${floorDays(totalHours)} dagen`;
+    const totalCH = statutoryCH + replacementCH + regionalCH + seniorityCH + adv1CH + adv2CH + adv3CH + adv4CH;
+    document.getElementById("total-hours-label").textContent = `Totaal: ${formatHoursCH(totalCH)} uur`;
+    document.getElementById("total-days-label").textContent = `${floorDaysCH(totalCH)} dagen`;
   }
 
   function confirmInputs() {
-    const statutory = parseFloat(document.getElementById("statutory-hours").value) || 0;
-    const replacement = parseFloat(document.getElementById("replacement-hours").value) || 0;
-    const regional = parseFloat(document.getElementById("regional-hours").value) || 0;
-    const adv1 = parseFloat(document.getElementById("adv1-hours").value) || 0;
-    const adv2 = parseFloat(document.getElementById("adv2-hours").value) || 0;
-    const adv3 = parseFloat(document.getElementById("adv3-hours").value) || 0;
-    const adv4 = parseFloat(document.getElementById("adv4-hours").value) || 0;
+    const statutoryCH = toCentiHours(document.getElementById("statutory-hours").value);
+    const replacementCH = toCentiHours(document.getElementById("replacement-hours").value);
+    const regionalCH = toCentiHours(document.getElementById("regional-hours").value);
+    const seniorityCH = toCentiHours(document.getElementById("seniority-hours").value);
+    const adv1CH = toCentiHours(document.getElementById("adv1-hours").value);
+    const adv2CH = toCentiHours(document.getElementById("adv2-hours").value);
+    const adv3CH = toCentiHours(document.getElementById("adv3-hours").value);
+    const adv4CH = toCentiHours(document.getElementById("adv4-hours").value);
 
-    // Check of er al meer uren ingepland zijn dan de nieuwe tellers toelaten
-    const used = computeUsedHours();
+    const used = computeUsedHoursCH();
     const warnings = [];
 
-    if (used.statutory > statutory) {
-      warnings.push(`- Wettelijk verlof: ingepland ${formatHours(used.statutory)} u > nieuwe teller ${formatHours(statutory)} u`);
+    if (used.statutoryCH > statutoryCH) {
+      warnings.push(`- Wettelijk verlof: ingepland ${formatHoursCH(used.statutoryCH)} u > nieuwe teller ${formatHoursCH(statutoryCH)} u`);
     }
-    if (used.replacement > replacement) {
-      warnings.push(`- Vervangende feestdagen: ingepland ${formatHours(used.replacement)} u > nieuwe teller ${formatHours(replacement)} u`);
+    if (used.replacementCH > replacementCH) {
+      warnings.push(`- Vervangende feestdagen: ingepland ${formatHoursCH(used.replacementCH)} u > nieuwe teller ${formatHoursCH(replacementCH)} u`);
     }
-    if (used.regional > regional) {
-      warnings.push(`- Vlaamse Gemeenschap: ingepland ${formatHours(used.regional)} u > nieuwe teller ${formatHours(regional)} u`);
+    if (used.regionalCH > regionalCH) {
+      warnings.push(`- Vlaamse Gemeenschap: ingepland ${formatHoursCH(used.regionalCH)} u > nieuwe teller ${formatHoursCH(regionalCH)} u`);
     }
-    if (used.adv[0] > adv1) {
-      warnings.push(`- ADV Q1: ingepland ${formatHours(used.adv[0])} u > nieuwe teller ${formatHours(adv1)} u`);
+    if (used.seniorityCH > seniorityCH) {
+      warnings.push(`- Ancieniteitsverlof: ingepland ${formatHoursCH(used.seniorityCH)} u > nieuwe teller ${formatHoursCH(seniorityCH)} u`);
     }
-    if (used.adv[1] > adv2) {
-      warnings.push(`- ADV Q2: ingepland ${formatHours(used.adv[1])} u > nieuwe teller ${formatHours(adv2)} u`);
+    if (used.advCH[0] > adv1CH) {
+      warnings.push(`- ADV Q1: ingepland ${formatHoursCH(used.advCH[0])} u > nieuwe teller ${formatHoursCH(adv1CH)} u`);
     }
-    if (used.adv[2] > adv3) {
-      warnings.push(`- ADV Q3: ingepland ${formatHours(used.adv[2])} u > nieuwe teller ${formatHours(adv3)} u`);
+    if (used.advCH[1] > adv2CH) {
+      warnings.push(`- ADV Q2: ingepland ${formatHoursCH(used.advCH[1])} u > nieuwe teller ${formatHoursCH(adv2CH)} u`);
     }
-    if (used.adv[3] > adv4) {
-      warnings.push(`- ADV Q4: ingepland ${formatHours(used.adv[3])} u > nieuwe teller ${formatHours(adv4)} u`);
+    if (used.advCH[2] > adv3CH) {
+      warnings.push(`- ADV Q3: ingepland ${formatHoursCH(used.advCH[2])} u > nieuwe teller ${formatHoursCH(adv3CH)} u`);
+    }
+    if (used.advCH[3] > adv4CH) {
+      warnings.push(`- ADV Q4: ingepland ${formatHoursCH(used.advCH[3])} u > nieuwe teller ${formatHoursCH(adv4CH)} u`);
     }
 
     if (warnings.length > 0) {
@@ -1433,10 +1517,11 @@
     }
 
     state.countersInitial = {
-      statutory,
-      replacement,
-      regional,
-      adv: [adv1, adv2, adv3, adv4],
+      statutoryCH,
+      replacementCH,
+      regionalCH,
+      seniorityCH,
+      advCH: [adv1CH, adv2CH, adv3CH, adv4CH],
     };
     state.inputsLocked = true;
     saveState();
@@ -1448,12 +1533,10 @@
   function updateInputsLockedUI() {
     const locked = state.inputsLocked;
     const ids = [
-      "statutory-hours","replacement-hours","regional-hours",
+      "statutory-hours","replacement-hours","regional-hours","seniority-hours",
       "adv1-hours","adv2-hours","adv3-hours","adv4-hours",
     ];
-    ids.forEach(id => {
-      document.getElementById(id).disabled = locked;
-    });
+    ids.forEach(id => { document.getElementById(id).disabled = locked; });
 
     document.getElementById("confirm-inputs-btn").style.display = locked ? "none" : "inline-flex";
     document.getElementById("edit-inputs-btn").style.display = locked ? "inline-flex" : "none";
@@ -1467,37 +1550,34 @@
   }
 
   function updateRemainingUI() {
-    const rem = computeRemaining();
+    const rem = computeRemainingCH();
 
     const fields = [
-      ["remaining-statutory", rem.statutory],
-      ["remaining-replacement", rem.replacement],
-      ["remaining-regional", rem.regional],
-      ["remaining-adv1", rem.adv[0]],
-      ["remaining-adv2", rem.adv[1]],
-      ["remaining-adv3", rem.adv[2]],
-      ["remaining-adv4", rem.adv[3]],
+      ["remaining-statutory", rem.statutoryCH],
+      ["remaining-replacement", rem.replacementCH],
+      ["remaining-regional", rem.regionalCH],
+      ["remaining-seniority", rem.seniorityCH],
+      ["remaining-adv1", rem.advCH[0]],
+      ["remaining-adv2", rem.advCH[1]],
+      ["remaining-adv3", rem.advCH[2]],
+      ["remaining-adv4", rem.advCH[3]],
     ];
 
-    fields.forEach(([id, hours]) => {
+    fields.forEach(([id, hoursCH]) => {
       const el = document.getElementById(id);
-      el.textContent = `${formatHours(hours)} u (${floorDays(hours)} d)`;
-      if (hours < 0) {
-        el.classList.add("negative");
-      } else {
-        el.classList.remove("negative");
-      }
+      el.textContent = `${formatHoursCH(hoursCH)} u (${floorDaysCH(hoursCH)} d)`;
+      if (hoursCH < 0) el.classList.add("negative");
+      else el.classList.remove("negative");
     });
 
-    const totalHours = rem.statutory + rem.replacement + rem.regional +
-      rem.adv[0] + rem.adv[1] + rem.adv[2] + rem.adv[3];
+    const totalCH =
+      rem.statutoryCH + rem.replacementCH + rem.regionalCH + rem.seniorityCH +
+      rem.advCH[0] + rem.advCH[1] + rem.advCH[2] + rem.advCH[3];
+
     const totalEl = document.getElementById("remaining-total");
-    totalEl.textContent = `${formatHours(totalHours)} u (${floorDays(totalHours)} d)`;
-    if (totalHours < 0) {
-      totalEl.classList.add("negative");
-    } else {
-      totalEl.classList.remove("negative");
-    }
+    totalEl.textContent = `${formatHoursCH(totalCH)} u (${floorDaysCH(totalCH)} d)`;
+    if (totalCH < 0) totalEl.classList.add("negative");
+    else totalEl.classList.remove("negative");
   }
 
   // --- Year & PC dropdowns ---
@@ -1545,18 +1625,20 @@
     entries.sort(([d1], [d2]) => d1.localeCompare(d2));
 
     entries.forEach(([dateIsoStr, sel]) => {
-      const dateObj = new Date(dateIsoStr);
+      const dateObj = parseIsoLocal(dateIsoStr); // BUGFIX: local parse
       const holiday = holidayMap[dateIsoStr];
+
       let typeLabel = "";
       switch (sel.type) {
         case LEAVE_TYPES.ADV:
           typeLabel = "ADV";
-          if (typeof sel.advBucket === "number") {
-            typeLabel += ` (Q${sel.advBucket + 1})`;
-          }
+          if (typeof sel.advBucket === "number") typeLabel += ` (Q${sel.advBucket + 1})`;
           break;
         case LEAVE_TYPES.REGIONAL:
           typeLabel = "Vlaamse Gemeenschap";
+          break;
+        case LEAVE_TYPES.SENIORITY:
+          typeLabel = "Ancieniteitsverlof";
           break;
         case LEAVE_TYPES.REPLACEMENT:
           typeLabel = "Vervangende feestdag";
@@ -1565,11 +1647,12 @@
           typeLabel = "Wettelijk verlof";
           break;
       }
+
       const row = [
         dateIsoStr,
         weekdayName(dateObj),
         typeLabel,
-        sel.hours.toFixed(2).replace(".", ","),
+        fromCentiHours(sel.hoursCH).toFixed(2).replace(".", ","),
         sel.half ? "1" : "0",
         holiday ? holiday.name : "",
       ];
@@ -1636,14 +1719,17 @@
     document.getElementById("year-select").value = String(state.year);
     document.getElementById("pc-select").value = state.pcCode;
 
-    document.getElementById("statutory-hours").value = state.countersInitial.statutory || 0;
-    document.getElementById("replacement-hours").value = state.countersInitial.replacement || 0;
-    document.getElementById("regional-hours").value = state.countersInitial.regional || 0;
-    document.getElementById("adv1-hours").value = state.countersInitial.adv[0] || 0;
-    document.getElementById("adv2-hours").value = state.countersInitial.adv[1] || 0;
-    document.getElementById("adv3-hours").value = state.countersInitial.adv[2] || 0;
-    document.getElementById("adv4-hours").value = state.countersInitial.adv[3] || 0;
+    document.getElementById("statutory-hours").value = fromCentiHours(state.countersInitial.statutoryCH) || 0;
+    document.getElementById("replacement-hours").value = fromCentiHours(state.countersInitial.replacementCH) || 0;
+    document.getElementById("regional-hours").value = fromCentiHours(state.countersInitial.regionalCH) || 0;
+    document.getElementById("seniority-hours").value = fromCentiHours(state.countersInitial.seniorityCH) || 0;
 
+    document.getElementById("adv1-hours").value = fromCentiHours(state.countersInitial.advCH[0]) || 0;
+    document.getElementById("adv2-hours").value = fromCentiHours(state.countersInitial.advCH[1]) || 0;
+    document.getElementById("adv3-hours").value = fromCentiHours(state.countersInitial.advCH[2]) || 0;
+    document.getElementById("adv4-hours").value = fromCentiHours(state.countersInitial.advCH[3]) || 0;
+
+    updateCalendarHelpText();
     updateInputDaysLabels();
     updateInputsLockedUI();
 
@@ -1651,8 +1737,7 @@
     updateRemainingUI();
 
     document.getElementById("error-message").textContent = "";
-    const now = new Date(state.year, 0, 1);
-    showDayDetails(now);
+    showDayDetails(new Date(state.year, 0, 1));
   }
 
   // --- Init ---
@@ -1666,7 +1751,7 @@
     updateUIFromState();
 
     [
-      "statutory-hours","replacement-hours","regional-hours",
+      "statutory-hours","replacement-hours","regional-hours","seniority-hours",
       "adv1-hours","adv2-hours","adv3-hours","adv4-hours",
     ].forEach(id => {
       document.getElementById(id).addEventListener("input", updateInputDaysLabels);
